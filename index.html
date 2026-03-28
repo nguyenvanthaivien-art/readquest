@@ -608,6 +608,23 @@ textarea.inp{resize:vertical;min-height:70px;line-height:1.5}
 </style>
 </head>
 <body>
+<!-- PASSWORD GATE -->
+<div id="pw-gate" style="position:fixed;inset:0;z-index:99999;background:#06040f;display:flex;align-items:center;justify-content:center;padding:20px">
+  <div style="width:100%;max-width:340px;text-align:center">
+    <div style="font-family:'Cinzel Decorative',serif;font-size:1.6rem;font-weight:900;background:linear-gradient(160deg,#7a5010 0%,#c8921a 20%,#f5d980 50%,#c8921a 80%,#7a5010 100%);background-size:200% auto;animation:gold-shine 6s linear infinite;-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 24px rgba(200,146,26,0.5));margin-bottom:6px">⚔ ReadQuest ⚔</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.55rem;color:rgba(220,185,125,0.72);letter-spacing:.22em;text-transform:uppercase;margin-bottom:32px">Chronicles of Knowledge</div>
+    <div style="background:rgba(7,5,16,0.88);border:1px solid rgba(200,146,26,0.25);padding:28px 24px;position:relative">
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 5%,rgba(200,146,26,0.45) 30%,#e8b84b 50%,rgba(200,146,26,0.45) 70%,transparent 95%)"></div>
+      <div style="font-family:'Cinzel',serif;font-size:.6rem;letter-spacing:.18em;color:#c8921a;text-transform:uppercase;margin-bottom:16px">🔐 ENTER PASSPHRASE</div>
+      <input id="pw-input" type="password" placeholder="Passphrase..."
+        style="width:100%;background:rgba(3,2,8,0.8);border:1px solid rgba(200,146,26,0.18);color:rgba(255,245,215,1);font-family:'Share Tech Mono',monospace;font-size:.9rem;padding:12px 14px;outline:none;margin-bottom:10px;text-align:center;letter-spacing:.1em;transition:border-color .2s"
+        onkeydown="if(event.key==='Enter')checkPw()"/>
+      <button onclick="checkPw()" style="width:100%;padding:13px;border:none;cursor:pointer;font-family:'Cinzel',serif;font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;background:linear-gradient(135deg,#6a2f00,#c8921a);color:#0a0300;clip-path:polygon(8px 0,calc(100% - 8px) 0,100% 50%,calc(100% - 8px) 100%,8px 100%,0 50%);transition:all .2s">▶ ENTER THE REALM</button>
+      <div id="pw-err" style="margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:.62rem;color:#f87171;min-height:16px;display:none">⚔ Sai passphrase. Thử lại.</div>
+    </div>
+  </div>
+</div>
+<div id="pw-gap" style="display:none">
 <div class="bg"></div>
 <div class="grid-lines"></div>
 <div class="tw" id="tw"></div>
@@ -1047,36 +1064,47 @@ function syncBar(status,msg){
   el.textContent=msg;
 }
 
+// ═══ JSONBIN CONFIG ═══
+const JB_KEY='$2a$10$/iMHriE2R2.4BMBHKkCZgeIE6mAsfuCvwnHGx3utHSobAIbJyXzT2';
+const JB_BIN_ID='69c7db885fdde574550a62b0';
+var _saveTimer=null;
+
+async function jbGetBinId(){
+  return JB_BIN_ID;
+}
+
 async function cloudLoad(){
-  syncBar('loading','⏳ Loading data...');
+  syncBar('loading','⏳ Đang kết nối cloud...');
   try{
-    const r=await window.storage.get('rq3_state');
-    if(r&&r.value){
-      S=JSON.parse(r.value);
-      syncBar('ok','☁ Synced — all devices share this data');
+    var binId=await jbGetBinId();
+    var r=await fetch('https://api.jsonbin.io/v3/b/'+binId+'/latest',{
+      headers:{'X-Master-Key':JB_KEY}
+    });
+    var d=await r.json();
+    if(d.record&&typeof d.record.totalXP!=='undefined'){
+      S=d.record;
+      syncBar('ok','☁ Synced — dữ liệu đã được tải');
     } else {
-      syncBar('ok','☁ New data — ready to sync');
+      syncBar('ok','☁ Cloud mới — sẵn sàng lưu dữ liệu');
     }
   } catch(e){
-    // Fallback to localStorage
+    // Fallback localStorage
     try{
-      const lc=localStorage.getItem('rq3');
+      var lc=localStorage.getItem('rq3');
       if(lc){S=JSON.parse(lc);}
-      syncBar('err','! Offline — using local data');
+      syncBar('err','⚠ Offline — dùng dữ liệu cục bộ');
     } catch(_){
-      syncBar('err','! Could not load data');
+      syncBar('err','! Không tải được dữ liệu');
     }
   }
-  // Migrate legacy single book to books array
   if(!S.books)S.books=[];
   if(!S.bookNotes)S.bookNotes={};
   if(S.currentBook&&S.currentBook.title&&!S.books.length){
-    const migId='bk_migrated';
+    var migId='bk_migrated';
     S.books.push({id:migId,title:S.currentBook.title,author:S.currentBook.author||'',page:S.currentBook.page||0,total:S.currentBook.total||0,done:false,added:S.lastDate||today()});
     S.activeBookId=migId;
   }
   checkFrozenExpiry();recalcStreak();renderHome();setMode('book');checkAch();
-  // Restore paused timer if it was saved
   if(S._timerState&&S._timerState.elapsedMs>0){
     var ts=S._timerState;
     mode=ts.mode||'book';
@@ -1084,8 +1112,7 @@ async function cloudLoad(){
     _gameBudgetAtStart=ts.gameBudgetAtStart||S.gameBudget;
     _gameTotalAtStart=ts.gameTotalAtStart||S.totalGame;
     paused=true;running=false;_startTs=0;
-    // Restore UI to paused state
-    setMode(mode);// This resets _elapsedMs, so re-set it after
+    setMode(mode);
     _elapsedMs=ts.elapsedMs;
     paused=true;
     document.getElementById('btn-pause').disabled=false;
@@ -1104,13 +1131,23 @@ async function cloudLoad(){
 
 async function save(){
   try{localStorage.setItem('rq3',JSON.stringify(S));}catch(_){}
-  syncBar('save','... Saving...');
-  try{
-    await window.storage.set('rq3_state',JSON.stringify(S));
-    syncBar('ok','☁ Saved & synced');
-  } catch(e){
-    syncBar('err','! Saved locally (cloud connection lost)');
-  }
+  // Debounce — chờ 1.5s sau lần save cuối mới đẩy lên cloud, tránh spam API
+  if(_saveTimer)clearTimeout(_saveTimer);
+  syncBar('save','... Đang lưu...');
+  _saveTimer=setTimeout(async function(){
+    try{
+      var binId=await jbGetBinId();
+      var r=await fetch('https://api.jsonbin.io/v3/b/'+binId,{
+        method:'PUT',
+        headers:{'Content-Type':'application/json','X-Master-Key':JB_KEY},
+        body:JSON.stringify(S)
+      });
+      if(!r.ok)throw new Error('HTTP '+r.status);
+      syncBar('ok','☁ Đã lưu & sync cloud');
+    } catch(e){
+      syncBar('err','⚠ Lưu cục bộ (mất kết nối cloud)');
+    }
+  },1500);
 }
 function currentTier(){return TIERS[Math.floor(S.ri/5)];}
 function currentDivIdx(){return S.ri%5;}
@@ -2947,5 +2984,45 @@ document.addEventListener('DOMContentLoaded',function(){
   });
 });
 </script>
+
+<script>
+// ═══ PASSWORD GATE ═══
+var PW_HASH='4a4e1e9fcd874a6e1e9a63cd70c4d7a9b6f5c2e8d3a1b0f7e6c5d4a3b2c1d0e';
+function simpleHash(str){
+  var h=0;
+  for(var i=0;i<str.length;i++){h=Math.imul(31,h)+str.charCodeAt(i)|0;}
+  return Math.abs(h).toString(16);
+}
+var _PW='th@ivieN182';
+function checkPw(){
+  var val=document.getElementById('pw-input').value;
+  var err=document.getElementById('pw-err');
+  if(val===_PW){
+    // Lưu session
+    sessionStorage.setItem('rq_auth','1');
+    document.getElementById('pw-gate').style.display='none';
+    document.getElementById('pw-gap').style.display='block';
+    // Focus input password để tránh lộ
+    document.getElementById('pw-input').value='';
+  } else {
+    err.style.display='block';
+    document.getElementById('pw-input').value='';
+    document.getElementById('pw-input').focus();
+    setTimeout(function(){err.style.display='none';},3000);
+  }
+}
+// Kiểm tra session khi load — nếu đã auth trong tab này thì bỏ qua gate
+document.addEventListener('DOMContentLoaded',function(){
+  if(sessionStorage.getItem('rq_auth')==='1'){
+    document.getElementById('pw-gate').style.display='none';
+    document.getElementById('pw-gap').style.display='block';
+  } else {
+    setTimeout(function(){
+      document.getElementById('pw-input').focus();
+    },300);
+  }
+});
+</script>
+</div>
 </body>
 </html>
