@@ -1,0 +1,3096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReadQuest — Chronicles of Knowledge</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700;900&family=IM+Fell+English:ital@0;1&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#06040f;
+  --gold:#c8921a;
+  --gold2:#e8b84b;
+  --gold3:#f5d980;
+  --gold-glow:rgba(200,146,26,0.25);
+  --gold-dim:rgba(200,146,26,0.07);
+  --crimson:#7c1c1c;
+  --crimson2:#b02222;
+  --ice:#4a8fa8;
+  --ice-glow:rgba(74,143,168,0.2);
+  --text:rgba(255,245,215,1);
+  --muted:rgba(220,185,125,0.72);
+  --border:rgba(200,146,26,0.18);
+  --border-hi:rgba(200,146,26,0.42);
+  --card-bg:rgba(7,5,16,0.88);
+  --card-bg-h:rgba(11,8,24,0.95);
+  --rc:var(--gold);
+  --tier-glow:var(--gold-glow);
+}
+html,body{height:100%;overflow-x:hidden}
+body{font-family:'IM Fell English',serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.55}
+
+/* ── BACKGROUND ── */
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 45% at 10% 0%,   rgba(124,28,28,0.13) 0%,transparent 60%),
+    radial-gradient(ellipse 55% 40% at 90% 100%,  rgba(74,143,168,0.09) 0%,transparent 55%),
+    radial-gradient(ellipse 80% 60% at 50% 50%,   rgba(200,146,26,0.03) 0%,transparent 65%),
+    #06040f;
+}
+/* SVG noise texture overlay */
+.bg::before{
+  content:'';position:fixed;inset:0;opacity:.028;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat:repeat;
+}
+.grid-lines{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(200,146,26,0.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(200,146,26,0.025) 1px,transparent 1px);
+  background-size:52px 52px;
+}
+
+/* ── LAYOUT ── */
+.app{position:relative;z-index:1;max-width:768px;margin:0 auto;padding-bottom:80px}
+
+/* ── HEADER ── */
+.hdr{text-align:center;padding:30px 16px 0;position:relative}
+.hdr-ornament{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:4px;opacity:.45}
+.hdr-ornament::before,.hdr-ornament::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}
+.hdr-rune{font-size:.6rem;color:var(--gold);letter-spacing:.3em}
+.logo{
+  font-family:'Cinzel Decorative',serif;
+  font-size:clamp(1.25rem,5vw,1.85rem);
+  font-weight:900;letter-spacing:.1em;
+  background:linear-gradient(160deg,#7a5010 0%,#c8921a 20%,#f5d980 50%,#c8921a 80%,#7a5010 100%);
+  background-size:200% auto;
+  animation:gold-shine 6s linear infinite;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 24px rgba(200,146,26,0.5));
+}
+@keyframes gold-shine{0%{background-position:0% center}100%{background-position:200% center}}
+.logo-sub{font-family:'Share Tech Mono',monospace;font-size:.52rem;color:var(--muted);letter-spacing:.22em;text-transform:uppercase;margin-top:2px}
+.hdr-divider{height:1px;margin:14px 0 0;background:linear-gradient(90deg,transparent 2%,var(--gold) 25%,var(--gold2) 50%,var(--gold) 75%,transparent 98%);opacity:.3}
+
+/* ── NAV ── */
+.nav{
+  display:flex;
+  background:rgba(3,2,8,0.97);
+  border-top:1px solid rgba(200,146,26,0.28);
+  border-bottom:1px solid rgba(200,146,26,0.1);
+  position:sticky;top:0;z-index:99;
+  box-shadow:0 4px 28px rgba(0,0,0,0.65),0 1px 0 rgba(200,146,26,0.06);
+}
+.nb{
+  flex:1;padding:9px 1px 7px;background:none;border:none;cursor:pointer;
+  font-family:'Cinzel',serif;font-size:.46rem;font-weight:700;
+  letter-spacing:.07em;color:var(--muted);text-transform:uppercase;
+  transition:color .2s;display:flex;flex-direction:column;align-items:center;gap:2px;
+  position:relative;
+}
+.nb::after{content:'';position:absolute;bottom:0;left:50%;right:50%;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  transition:left .25s,right .25s;opacity:0;
+}
+.nb.on{color:var(--gold2)}
+.nb.on::after{left:8%;right:8%;opacity:1}
+.nb-i{font-size:.85rem}
+.nb:hover:not(.on){color:rgba(200,146,26,0.7)}
+
+/* ── PAGES ── */
+.pg{display:none;padding:14px;flex-direction:column;gap:12px;animation:pgIn .25s ease}
+.pg.on{display:flex}
+@keyframes pgIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── CARD ── */
+.card{
+  background:var(--card-bg);
+  border:1px solid var(--border);
+  border-radius:3px;
+  padding:18px;
+  position:relative;
+  overflow:hidden;
+  box-shadow:0 8px 36px rgba(0,0,0,0.65),inset 0 1px 0 rgba(200,146,26,0.07);
+  transition:box-shadow .2s,background .2s;
+}
+/* Top gold shimmer line */
+.card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent 5%,rgba(200,146,26,0.45) 30%,var(--gold2) 50%,rgba(200,146,26,0.45) 70%,transparent 95%);
+}
+/* Corner marks */
+.card::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent 35%,rgba(200,146,26,0.12) 50%,transparent 65%);
+}
+.card:hover{background:var(--card-bg-h);box-shadow:0 12px 44px rgba(0,0,0,0.75),0 0 0 1px rgba(200,146,26,0.22)}
+
+/* Decorative corner brackets rendered via JS-added spans */
+.cc{position:absolute;width:10px;height:10px;border-color:var(--gold);opacity:.35}
+.cc-tl{top:5px;left:5px;border-top:1px solid;border-left:1px solid}
+.cc-tr{top:5px;right:5px;border-top:1px solid;border-right:1px solid}
+.cc-bl{bottom:5px;left:5px;border-bottom:1px solid;border-left:1px solid}
+.cc-br{bottom:5px;right:5px;border-bottom:1px solid;border-right:1px solid}
+
+/* ── CARD TITLE ── */
+.ct{
+  font-family:'Cinzel',serif;font-size:.58rem;letter-spacing:.18em;
+  color:var(--gold);text-transform:uppercase;margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.ct-dot{width:3px;height:14px;border-radius:1px;background:var(--gold);flex-shrink:0;box-shadow:0 0 8px var(--gold)}
+
+/* ── RANK HERO ── */
+.rank-hero{display:flex;align-items:center;gap:16px}
+.rank-badge{position:relative;flex-shrink:0}
+.rank-ring{
+  width:80px;height:80px;
+  clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  background:linear-gradient(145deg,rgba(22,14,6,0.95),rgba(44,28,10,0.98));
+  box-shadow:0 0 0 2px var(--gold),0 0 22px var(--gold-glow);
+  animation:hex-pulse 3s ease-in-out infinite;
+  font-size:2rem;
+}
+@keyframes hex-pulse{0%,100%{box-shadow:0 0 0 2px var(--gold),0 0 16px var(--gold-glow)}50%{box-shadow:0 0 0 2px var(--gold2),0 0 32px rgba(200,146,26,0.45)}}
+.rank-div-badge{
+  position:absolute;bottom:-6px;right:-6px;
+  width:22px;height:22px;
+  clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);
+  background:var(--gold);display:flex;align-items:center;justify-content:center;
+  font-family:'Cinzel',serif;font-size:.5rem;font-weight:900;color:#0a0500;
+}
+.rank-meta{flex:1}
+.rank-tier-name{font-family:'Cinzel Decorative',serif;font-size:.95rem;font-weight:900;color:var(--gold2);line-height:1;letter-spacing:.05em;text-shadow:0 0 14px var(--gold-glow)}
+.rank-flavor{font-size:.78rem;color:var(--muted);margin-top:3px;font-style:italic}
+.rank-xp-row{display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--muted);margin-top:10px}
+.xp-bar{height:5px;background:rgba(200,146,26,0.07);border-radius:0;margin-top:4px;overflow:hidden;border:1px solid rgba(200,146,26,0.14)}
+.xp-fill{height:100%;transition:width 1.2s cubic-bezier(.4,2,.5,1);background:linear-gradient(90deg,#7a5010,var(--gold2));box-shadow:0 0 8px var(--gold)}
+.promo-ready-btn{
+  margin-top:11px;width:100%;padding:11px;
+  border:1px solid var(--gold);
+  background:linear-gradient(135deg,rgba(124,28,28,0.35),rgba(200,146,26,0.12));
+  color:var(--gold2);cursor:pointer;
+  font-family:'Cinzel',serif;font-size:.62rem;font-weight:700;letter-spacing:.14em;
+  clip-path:polygon(8px 0,calc(100% - 8px) 0,100% 50%,calc(100% - 8px) 100%,8px 100%,0 50%);
+  transition:all .2s;animation:promo-glow 2.5s ease-in-out infinite;
+}
+@keyframes promo-glow{0%,100%{box-shadow:0 0 8px rgba(200,146,26,0.2)}50%{box-shadow:0 0 22px rgba(200,146,26,0.55),0 0 40px rgba(124,28,28,0.25)}}
+
+/* ── STAT GRID ── */
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sb{
+  background:linear-gradient(155deg,rgba(10,7,20,0.92),rgba(6,4,12,0.96));
+  border:1px solid var(--border);padding:12px 8px;text-align:center;
+  clip-path:polygon(5px 0,100% 0,100% calc(100% - 5px),calc(100% - 5px) 100%,0 100%,0 5px);
+  box-shadow:inset 0 1px 0 rgba(200,146,26,0.07);
+}
+.sv{font-family:'Cinzel',serif;font-size:1.1rem;font-weight:700;line-height:1}
+.sl{font-family:'Share Tech Mono',monospace;font-size:.52rem;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.04em}
+
+/* ── STREAK ── */
+.streak-row{display:flex;align-items:center;gap:12px}
+.fire-wrap{font-size:2.8rem;filter:drop-shadow(0 0 14px #fb923c);animation:fire 2s ease-in-out infinite}
+@keyframes fire{0%,100%{transform:scaleY(1) rotate(-2deg)}50%{transform:scaleY(1.07) rotate(2deg)}}
+.streak-n{font-family:'Cinzel',serif;font-size:2.4rem;font-weight:900;color:#fb923c;line-height:1;text-shadow:0 0 18px rgba(251,146,60,0.5)}
+.streak-lbl{font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.streak-ms{flex:1;display:flex;flex-direction:column;gap:3px}
+.sm-row{display:flex;align-items:center;gap:6px;font-size:.72rem;padding:4px 8px;border:1px solid rgba(200,146,26,0.05);color:var(--muted)}
+.sm-row.hit{border-color:rgba(200,146,26,0.3);color:var(--gold);background:rgba(200,146,26,0.05)}
+
+/* ── WEEK DAYS ── */
+.wk{display:flex;gap:5px;justify-content:center}
+.wd{
+  width:38px;height:44px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  font-family:'Share Tech Mono',monospace;font-size:.52rem;font-weight:700;text-transform:uppercase;
+  border:1px solid rgba(200,146,26,0.08);color:var(--muted);background:rgba(200,146,26,0.01);
+  clip-path:polygon(4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%,0 4px);
+}
+.wd.done{background:rgba(200,146,26,0.08);border-color:rgba(200,146,26,0.32);color:var(--gold)}
+.wd.today{border-color:var(--gold2);color:var(--gold2)}
+.wd.today.done{background:rgba(200,146,26,0.14);border-color:var(--gold2);color:var(--gold2)}
+.wd .wc{font-size:.8rem}
+
+/* ── BONUS LIST ── */
+.bl{display:flex;flex-direction:column;gap:5px}
+.br{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid rgba(200,146,26,0.05);background:rgba(200,146,26,0.01);font-size:.82rem}
+.br.ab{background:rgba(52,211,153,0.06);border-color:rgba(52,211,153,0.28);color:#34d399}
+.br.locked{opacity:.32}
+.bi{font-size:.95rem;flex-shrink:0}.bd{flex:1}
+.bv{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--gold);white-space:nowrap}
+
+/* ── TIMER ── */
+.mode-sw{display:flex;gap:4px;background:rgba(0,0,0,0.45);padding:4px;border:1px solid var(--border)}
+.msb{
+  flex:1;padding:9px;border:none;
+  background:transparent;color:var(--muted);
+  font-family:'Cinzel',serif;font-size:.65rem;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;cursor:pointer;transition:all .2s;
+}
+.msb.bk{background:rgba(10,30,80,0.7);color:#93c5fd;border:1px solid rgba(96,165,250,0.22)}
+.msb.gm{background:rgba(5,50,35,0.7);color:#6ee7b7;border:1px solid rgba(52,211,153,0.22)}
+.budget-box{
+  display:flex;justify-content:space-between;align-items:center;
+  background:rgba(5,50,35,0.35);border:1px solid rgba(52,211,153,0.22);
+  padding:12px 16px;
+  clip-path:polygon(5px 0,100% 0,100% calc(100% - 5px),calc(100% - 5px) 100%,0 100%,0 5px);
+}
+.budget-v{font-family:'Cinzel',serif;font-size:1.8rem;font-weight:700;color:#34d399;text-shadow:0 0 14px rgba(52,211,153,0.4)}
+.budget-lbl{font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.clk{text-align:center;padding:20px 0 12px}
+.clk-n{font-family:'Cinzel',serif;font-size:4.8rem;font-weight:900;letter-spacing:.08em;line-height:1;transition:color .3s;text-shadow:0 0 36px currentColor}
+.clk.bk-clk .clk-n{color:#93c5fd}
+.clk.gm-clk .clk-n{color:#6ee7b7}
+.clk-sub{font-family:'Share Tech Mono',monospace;font-size:.55rem;color:var(--muted);letter-spacing:.25em;margin-top:5px}
+.clk-hint{font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--muted);margin-top:8px;background:var(--gold-dim);border:1px solid rgba(200,146,26,0.1);padding:6px 12px;text-align:center}
+.live-mult{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;flex-wrap:wrap}
+.mult-chip{padding:3px 9px;font-family:'Share Tech Mono',monospace;font-size:.6rem;border:1px solid rgba(200,146,26,0.1);color:var(--muted);background:rgba(0,0,0,0.3)}
+.mult-chip.active-chip{border-color:rgba(200,146,26,0.42);color:var(--gold);background:rgba(200,146,26,0.08)}
+.ctrl{display:flex;gap:8px;margin-top:6px}
+.btn-go{
+  flex:1;padding:14px;border:none;cursor:pointer;
+  font-family:'Cinzel',serif;font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  transition:all .2s;
+  clip-path:polygon(8px 0,calc(100% - 8px) 0,100% 50%,calc(100% - 8px) 100%,8px 100%,0 50%);
+}
+.btn-go:active{transform:scale(.97)}
+.btn-go:disabled{opacity:.3;cursor:not-allowed}
+.btn-read{background:linear-gradient(135deg,#0a1e4a,#1e40af,#2563eb);color:#dbeafe;box-shadow:0 4px 20px rgba(37,99,235,.35),inset 0 1px 0 rgba(255,255,255,0.15)}
+.btn-game{background:linear-gradient(135deg,#052e1c,#065f46,#10b981);color:#d1fae5;box-shadow:0 4px 20px rgba(16,185,129,.3),inset 0 1px 0 rgba(255,255,255,0.12)}
+.btn-stop{
+  padding:13px 15px;border:1px solid rgba(239,68,68,.4);
+  background:linear-gradient(135deg,rgba(100,8,8,0.28),rgba(239,68,68,.1));
+  color:#f87171;cursor:pointer;font-family:'Cinzel',serif;font-size:.68rem;font-weight:700;transition:all .2s;
+  clip-path:polygon(4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%,0 4px);
+  box-shadow:0 4px 14px rgba(239,68,68,.1);
+}
+.btn-stop:disabled{opacity:.25;cursor:not-allowed}
+.btn-pause{
+  padding:13px 15px;border:1px solid rgba(200,146,26,.42);
+  background:linear-gradient(135deg,rgba(80,50,5,0.28),rgba(200,146,26,.08));
+  color:var(--gold);cursor:pointer;font-family:'Cinzel',serif;font-size:.68rem;font-weight:700;transition:all .2s;
+  clip-path:polygon(4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%,0 4px);
+}
+.btn-pause:disabled{opacity:.25;cursor:not-allowed}
+.btn-pause.paused{border-color:#34d399;background:rgba(52,211,153,.12);color:#34d399;animation:pause-pulse 1.5s ease-in-out infinite}
+@keyframes pause-pulse{0%,100%{box-shadow:0 0 0 0 rgba(52,211,153,.3)}50%{box-shadow:0 0 0 6px rgba(52,211,153,0)}}
+.clk-n.paused-clk{animation:clk-blink 1s step-end infinite}
+@keyframes clk-blink{0%,100%{opacity:1}50%{opacity:.22}}
+
+/* ── PROMO ── */
+.promo-status{text-align:center;padding:8px 0}
+.promo-big-icon{font-size:3.5rem;margin-bottom:8px}
+.promo-title{font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.22em;color:var(--muted);text-transform:uppercase}
+.promo-rank{font-family:'Cinzel Decorative',serif;font-size:1.2rem;font-weight:900;color:var(--gold);margin-top:4px}
+.promo-arrow{font-size:1rem;color:var(--muted);margin:4px 0}
+.promo-target{font-family:'Cinzel Decorative',serif;font-size:1.05rem;color:#34d399}
+.promo-days-row{display:flex;gap:6px;justify-content:center;margin:10px 0}
+.pd{
+  width:36px;height:36px;
+  clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
+  display:flex;align-items:center;justify-content:center;font-size:.9rem;
+  background:rgba(200,146,26,0.04);color:var(--muted);position:relative;
+}
+.pd.done{color:#34d399}
+.pd.done::after{content:'';position:absolute;inset:0;background:rgba(52,211,153,0.14);clip-path:inherit}
+.pd.current{color:var(--gold);animation:pd-pulse 1.5s ease-in-out infinite}
+.pd.current::after{content:'';position:absolute;inset:0;background:rgba(200,146,26,0.18);clip-path:inherit}
+@keyframes pd-pulse{0%,100%{filter:drop-shadow(0 0 4px var(--gold))}50%{filter:drop-shadow(0 0 14px var(--gold))}}
+.promo-req-list{display:flex;flex-direction:column;gap:5px}
+.promo-req{display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(200,146,26,0.01);border:1px solid var(--border);font-size:.78rem}
+.promo-req.ok{background:rgba(52,211,153,0.05);border-color:rgba(52,211,153,.28);color:#34d399}
+.btn-promo{
+  padding:13px;border:none;cursor:pointer;
+  font-family:'Cinzel',serif;font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  transition:all .2s;width:100%;
+  clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,10px 100%,0 50%);
+}
+.btn-start-promo{
+  background:linear-gradient(135deg,#6a2f00,var(--gold),var(--gold3),var(--gold));
+  background-size:200% auto;animation:promo-glow 2s ease-in-out infinite,gold-shine 4s linear infinite;
+  color:#0a0400;font-weight:900;
+}
+.btn-cancel-promo{background:rgba(239,68,68,.08);border:1px solid #ef4444!important;color:#ef4444;clip-path:none}
+.reward-preview{background:var(--gold-dim);border:1px solid rgba(200,146,26,.18);padding:12px 14px}
+.rp-title{font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--muted);text-transform:uppercase;letter-spacing:.15em;margin-bottom:8px}
+.rp-row{display:flex;justify-content:space-between;font-size:.8rem;padding:3px 0;border-bottom:1px solid rgba(200,146,26,0.06)}
+.rp-row:last-child{border-bottom:none}
+.rp-val{color:var(--gold);font-weight:700;font-family:'Share Tech Mono',monospace}
+.no-promo-msg{text-align:center;padding:24px 16px;color:var(--muted);font-size:.88rem;line-height:1.7;font-style:italic}
+
+/* ── CHART ── */
+.chart-wrap{position:relative;padding:4px 0 0;user-select:none}
+.line-chart-svg{width:100%;overflow:visible;display:block}
+.lc-day-label{font-size:.50rem;fill:rgba(200,146,26,0.48);text-anchor:middle;font-family:'Share Tech Mono',monospace}
+.lc-day-label.today{fill:var(--gold2);font-weight:700}
+.lc-day-label.selected{fill:#67e8f9;font-weight:700}
+.lc-grid-label{font-size:.5rem;fill:rgba(200,146,26,0.28);text-anchor:end;font-family:'Share Tech Mono',monospace}
+.sg2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sb2{
+  background:rgba(7,5,16,0.8);border:1px solid var(--border);padding:14px 12px;
+  clip-path:polygon(4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%,0 4px);
+}
+.sv2{font-family:'Cinzel',serif;font-size:1.5rem;font-weight:700}
+.sl2{font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.05em}
+.rl-tier{margin-bottom:14px}
+.rl-tier-hdr{
+  font-family:'Cinzel Decorative',serif;font-size:.7rem;letter-spacing:.18em;
+  text-transform:uppercase;padding:8px 12px;margin-bottom:6px;
+  border-bottom:1px solid currentColor;opacity:.85;
+  display:flex;align-items:center;gap:10px;
+}
+.rl-item{display:flex;align-items:center;gap:12px;padding:9px 12px;border:1px solid rgba(200,146,26,0.06);background:rgba(200,146,26,0.01);margin-bottom:4px;font-size:.78rem;transition:all .2s;position:relative;overflow:hidden}
+.rl-item.cur{border-color:var(--gold)!important;background:rgba(200,146,26,0.08);box-shadow:0 0 16px rgba(200,146,26,0.12),inset 0 0 20px rgba(200,146,26,0.04)}
+.rl-item.cur::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.rl-item.locked{opacity:.28}
+.rl-item.unlocked{opacity:.85}
+.rank-badge-svg{width:44px;height:44px;flex-shrink:0}
+.rank-badge-svg.locked-badge{filter:grayscale(1) brightness(0.4)}
+.rl-rank-info{flex:1;min-width:0}
+.rl-rank-name{font-family:'Cinzel',serif;font-weight:700;font-size:.8rem;line-height:1.2}
+.rl-rank-div{font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--muted);margin-top:2px;letter-spacing:.08em}
+.rl-you-tag{font-family:'Share Tech Mono',monospace;font-size:.58rem;font-weight:700;padding:3px 8px;border-radius:0;letter-spacing:.12em;text-transform:uppercase;animation:hex-pulse 2s ease-in-out infinite}
+.rl-done-tag{font-size:.9rem}
+
+/* ── BOOKS ── */
+.cur-book{display:flex;gap:12px;align-items:center;background:rgba(10,22,45,0.5);border:1px solid rgba(96,165,250,0.2);padding:13px}
+.bk-spine{width:42px;height:58px;background:linear-gradient(135deg,#1e3a5f,#2563eb);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;border:1px solid rgba(96,165,250,0.28)}
+.bk-pbar{height:3px;background:rgba(200,146,26,0.08);margin-top:5px;overflow:hidden}
+.bk-pfill{height:100%;background:var(--gold);transition:width .5s}
+.inp{
+  width:100%;background:rgba(3,2,8,0.8);
+  border:1px solid rgba(200,146,26,0.14);
+  color:var(--text);font-family:'IM Fell English',serif;font-size:.88rem;
+  padding:9px 12px;outline:none;transition:border-color .2s;border-radius:0;
+}
+.inp:focus{border-color:var(--gold)}
+.inp::placeholder{color:var(--muted)}
+textarea.inp{resize:vertical;min-height:70px;line-height:1.5}
+.fg{display:flex;gap:8px}
+.btn-s{
+  padding:9px 14px;border:none;cursor:pointer;
+  font-family:'Cinzel',serif;font-size:.65rem;font-weight:700;letter-spacing:.08em;
+  transition:all .15s;text-transform:uppercase;
+}
+.btn-gold{background:linear-gradient(135deg,#6a2f00,var(--gold),var(--gold2));color:#0a0300}
+.btn-red{background:rgba(124,28,28,.2);border:1px solid rgba(124,28,28,0.5)!important;color:#f87171}
+.sess-list{display:flex;flex-direction:column;gap:5px;max-height:260px;overflow-y:auto}
+.si{display:flex;align-items:center;gap:8px;padding:9px 11px;background:rgba(200,146,26,0.02);border:1px solid rgba(200,146,26,0.07)}
+.si-d{font-family:'Share Tech Mono',monospace;font-size:.57rem;color:var(--muted);flex-shrink:0}
+.si-n{font-size:.72rem;color:var(--muted);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-style:italic}
+.si-m{font-family:'Cinzel',serif;font-size:.82rem;color:#93c5fd;font-weight:700;margin-left:auto;flex-shrink:0}
+
+/* ── ACHIEVEMENTS ── */
+.ag{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.ac{
+  padding:14px 12px;border:1px solid rgba(200,146,26,0.1);
+  background:rgba(7,5,16,0.72);position:relative;overflow:hidden;transition:all .3s;
+  clip-path:polygon(4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%,0 4px);
+}
+.ac-i{font-size:1.6rem;margin-bottom:5px;display:block}
+.ac-n{font-family:'Cinzel',serif;font-size:.64rem;font-weight:700;color:var(--muted)}
+.ac-d{font-size:.6rem;color:var(--muted);margin-top:2px;line-height:1.3;font-style:italic}
+.ac-dt{font-family:'Share Tech Mono',monospace;font-size:.53rem;color:var(--muted);margin-top:3px}
+
+/* ── TOAST ── */
+.tw{position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:6px;padding-top:10px;pointer-events:none;min-width:280px;max-width:90vw}
+.ti{
+  background:rgba(6,4,14,0.97);border:1px solid rgba(200,146,26,0.28);
+  padding:10px 16px;font-family:'Cinzel',serif;font-size:.7rem;font-weight:700;letter-spacing:.05em;
+  box-shadow:0 8px 28px rgba(0,0,0,.65);
+  animation:tin .3s cubic-bezier(.4,2,.5,1) forwards;
+  position:relative;overflow:hidden;
+}
+.ti::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.5}
+@keyframes tin{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
+.ti.tg{color:var(--gold);border-color:rgba(200,146,26,.35)}
+.ti.tgr{color:#6ee7b7;border-color:rgba(52,211,153,.3)}
+.ti.tp{color:#c4b5fd;border-color:rgba(167,139,250,.3)}
+.ti.tr{color:#f87171;border-color:rgba(248,113,113,.3)}
+
+/* ── RANK-UP POPUP ── */
+.rup{position:fixed;inset:0;z-index:9998;display:none;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.92);backdrop-filter:blur(12px);
+}
+.rup::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 65% 45% at 50% 50%,rgba(200,146,26,0.12),transparent 70%);pointer-events:none;
+}
+.rup-box{text-align:center;animation:rupIn .6s cubic-bezier(.4,2,.5,1);position:relative}
+@keyframes rupIn{from{transform:scale(.3) rotate(-12deg);opacity:0}to{transform:scale(1) rotate(0deg);opacity:1}}
+.rup-em{font-size:5rem;animation:ruf 2s ease-in-out infinite;filter:drop-shadow(0 0 32px var(--gold))}
+@keyframes ruf{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-10px) rotate(2deg)}}
+.rup-label{font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:.3em;color:var(--muted);text-transform:uppercase;margin-top:18px}
+.rup-name{font-family:'Cinzel Decorative',serif;font-size:1.9rem;font-weight:900;color:var(--gold2);margin-top:4px;text-shadow:0 0 32px var(--gold-glow)}
+.rup-reward{font-size:.88rem;color:var(--muted);margin-top:8px;font-style:italic}
+.rup-btn{
+  margin-top:20px;padding:12px 32px;border:1px solid var(--gold);
+  background:rgba(200,146,26,0.08);color:var(--gold);cursor:pointer;
+  font-family:'Cinzel',serif;font-size:.68rem;letter-spacing:.14em;transition:all .2s;
+  clip-path:polygon(8px 0,calc(100% - 8px) 0,100% 50%,calc(100% - 8px) 100%,8px 100%,0 50%);
+}
+.rup-btn:hover{background:rgba(200,146,26,0.15);box-shadow:0 0 18px rgba(200,146,26,0.3)}
+
+/* ── PARTICLES ── */
+.pt{position:fixed;pointer-events:none;z-index:9997;font-size:1rem;animation:ptf 1.6s ease-out forwards}
+@keyframes ptf{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(-160px) rotate(400deg);opacity:0}}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:rgba(200,146,26,.22);border-radius:0}
+
+/* ── VARIOUS ── */
+.pg-slash{color:var(--muted);font-size:1.1rem;line-height:2.2}
+.bk-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);background:rgba(200,146,26,0.01);margin-bottom:7px;cursor:pointer;transition:all .15s}
+.bk-item.active-bk{border-color:rgba(200,146,26,0.42);background:rgba(200,146,26,0.06)}
+.bk-item.done-bk{border-color:rgba(52,211,153,0.24);background:rgba(52,211,153,0.025);opacity:.65}
+.bk-spine2{width:36px;height:48px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;border:1px solid rgba(200,146,26,0.18)}
+.bk-info{flex:1;min-width:0}
+.bk-title{font-family:'Cinzel',serif;font-size:.8rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
+.bk-author{font-size:.68rem;color:var(--muted);margin-top:1px;font-style:italic}
+.bk-prog{font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--gold);margin-top:3px}
+.bk-actions{display:flex;gap:4px;flex-shrink:0}
+.bk-act-btn{width:28px;height:28px;border:1px solid var(--border);background:rgba(200,146,26,0.02);cursor:pointer;font-size:.75rem;display:flex;align-items:center;justify-content:center;transition:all .15s}
+
+/* Day picker */
+.day-chip{padding:5px 10px;border:1px solid rgba(200,146,26,0.1);background:rgba(200,146,26,0.02);color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:.56rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s}
+.day-chip.active-day{border-color:var(--gold);background:rgba(200,146,26,0.1);color:var(--gold)}
+.day-stat-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(200,146,26,0.06);font-size:.8rem}
+.day-stat-row:last-child{border-bottom:none}
+.day-stat-val{font-family:'Cinzel',serif;font-size:.8rem;color:#93c5fd;font-weight:700}
+.sess-time-chip{display:inline-block;padding:2px 7px;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.2);color:#a78bfa;font-family:'Share Tech Mono',monospace;font-size:.6rem;margin:2px}
+
+/* Popup */
+.popup-overlay{position:fixed;inset:0;z-index:9990;background:rgba(0,0,0,.82);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px}
+.popup-box{
+  background:linear-gradient(145deg,rgba(10,7,22,0.99),rgba(5,3,12,0.99));
+  border:1px solid var(--border-hi);padding:24px 20px;max-width:340px;width:100%;
+  box-shadow:0 20px 60px rgba(0,0,0,.75),0 0 0 1px rgba(200,146,26,0.05);
+  position:relative;
+}
+.popup-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 5%,var(--gold) 30%,var(--gold2) 50%,var(--gold) 70%,transparent 95%);opacity:.4}
+.popup-title{font-family:'Cinzel',serif;font-size:.78rem;letter-spacing:.16em;color:var(--gold);text-transform:uppercase;margin-bottom:14px}
+.popup-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(200,146,26,0.07);font-size:.82rem}
+.popup-row:last-of-type{border-bottom:none}
+.popup-val{font-family:'Cinzel',serif;font-size:.82rem;font-weight:700;color:var(--gold)}
+.popup-close{width:100%;margin-top:14px;padding:11px;border:1px solid var(--border);background:rgba(200,146,26,0.04);color:var(--muted);cursor:pointer;font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase}
+
+/* Frozen */
+.frozen-active{background:rgba(74,143,168,0.06);border:1px solid rgba(74,143,168,0.3);padding:14px;text-align:center}
+.frozen-days-row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:10px 0}
+.frozen-day-btn{padding:8px 14px;border:1px solid rgba(74,143,168,0.3);background:rgba(74,143,168,0.05);color:#67e8f9;font-family:'Cinzel',serif;font-size:.65rem;cursor:pointer;transition:all .15s}
+.frozen-day-btn.selected{background:rgba(74,143,168,0.18);border-color:#67e8f9;box-shadow:0 0 10px rgba(103,232,249,0.28)}
+.btn-freeze{padding:12px;border:none;cursor:pointer;font-family:'Cinzel',serif;font-size:.68rem;font-weight:700;letter-spacing:.1em;width:100%;margin-top:8px;background:linear-gradient(135deg,#0e7490,#67e8f9);color:#000}
+.btn-unfreeze{padding:12px;border:1px solid #67e8f9;cursor:pointer;font-family:'Cinzel',serif;font-size:.68rem;font-weight:700;letter-spacing:.1em;width:100%;margin-top:8px;background:rgba(103,232,249,0.05);color:#67e8f9}
+
+/* Moti items */
+.moti-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid rgba(200,146,26,0.07);border-left:3px solid var(--gold);cursor:pointer;transition:all .15s;background:rgba(200,146,26,0.015)}
+.moti-item:hover{background:rgba(200,146,26,0.04);transform:translateX(3px)}
+.moti-game-val{font-family:'Cinzel',serif;font-size:1.1rem;font-weight:900;color:#34d399;flex-shrink:0;text-align:center;min-width:50px;line-height:1}
+.moti-game-unit{font-family:'Share Tech Mono',monospace;font-size:.46rem;color:var(--muted);display:block;margin-top:2px;letter-spacing:.05em}
+.moti-item.urgent{border-left-color:#f87171}
+.moti-item.bonus{border-left-color:#34d399}
+.moti-item.special{border-left-color:#c4b5fd}
+.moti-item.streak-m{border-left-color:#fb923c}
+.moti-icon-big{font-size:1.5rem;flex-shrink:0}
+.moti-body{flex:1;min-width:0}
+.moti-title{font-family:'Cinzel',serif;font-size:.78rem;font-weight:700;line-height:1.3;color:var(--text)}
+.moti-desc{font-size:.72rem;color:var(--muted);margin-top:3px;line-height:1.4;font-style:italic}
+.moti-progress{margin-top:6px;height:3px;background:rgba(200,146,26,0.06);overflow:hidden}
+.moti-progress-bar{height:100%;transition:width .8s cubic-bezier(.4,2,.5,1)}
+
+/* Daily Review */
+.review-overlay{position:fixed;inset:0;z-index:9995;background:rgba(0,0,0,0.85);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:20px}
+.review-overlay.show{display:flex}
+.review-box{
+  background:linear-gradient(145deg,rgba(12,8,26,0.99),rgba(6,4,14,0.99));
+  border:1px solid rgba(200,146,26,0.35);padding:28px 24px;max-width:400px;width:100%;text-align:center;
+  animation:revIn .4s cubic-bezier(.175,.885,.32,1.275);
+  box-shadow:0 20px 60px rgba(0,0,0,.82),inset 0 1px 0 rgba(200,146,26,0.08);
+  position:relative;
+}
+.review-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 5%,var(--gold) 30%,var(--gold2) 50%,var(--gold) 70%,transparent 95%);opacity:.55}
+@keyframes revIn{from{transform:scale(.85) translateY(20px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.review-emoji{font-size:3.5rem;margin-bottom:12px;animation:revBounce 2s ease-in-out infinite;filter:drop-shadow(0 0 14px var(--gold))}
+@keyframes revBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.review-title{font-family:'Cinzel Decorative',serif;font-size:.95rem;font-weight:900;color:var(--gold2);letter-spacing:.08em;margin-bottom:6px}
+.review-subtitle{font-size:.88rem;color:var(--text);margin-bottom:16px;line-height:1.6;font-style:italic}
+.review-reward-box{background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.2);padding:14px;margin-bottom:16px}
+.review-reward-title{font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.14em;margin-bottom:8px}
+.review-rewards{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.review-rw-tag{padding:5px 12px;font-family:'Share Tech Mono',monospace;font-size:.68rem;font-weight:700}
+.review-rw-tag.game{background:rgba(52,211,153,0.1);color:#34d399;border:1px solid rgba(52,211,153,0.25)}
+.review-rw-tag.xp{background:rgba(200,146,26,0.1);color:var(--gold);border:1px solid rgba(200,146,26,0.25)}
+.review-textarea{width:100%;background:rgba(3,2,8,0.8);border:1px solid rgba(200,146,26,0.14);color:var(--text);font-family:'IM Fell English',serif;font-size:.88rem;min-height:80px;resize:vertical;outline:none;margin-bottom:12px;line-height:1.5;padding:12px;transition:border-color .2s}
+.review-textarea:focus{border-color:var(--gold)}
+.review-textarea::placeholder{color:var(--muted)}
+.review-btns{display:flex;gap:8px}
+.review-btn{flex:1;padding:12px;border:none;cursor:pointer;font-family:'Cinzel',serif;font-size:.75rem;font-weight:700;letter-spacing:.07em;transition:all .15s;text-transform:uppercase}
+.review-btn.primary{background:linear-gradient(135deg,#6a2f00,var(--gold));color:#0a0300}
+.review-btn.skip{background:rgba(200,146,26,0.04);border:1px solid rgba(200,146,26,0.12);color:var(--muted)}
+.review-btn:hover{transform:translateY(-1px)}
+.review-streak-bonus{margin-top:12px;font-size:.76rem;color:var(--muted);line-height:1.4;font-style:italic}
+
+/* Mission Bell */
+.mission-bell-anchor{position:sticky;top:56px;z-index:97;height:0;pointer-events:none}
+.mission-bell-pos{position:absolute;right:-56px;top:0;pointer-events:all}
+@media(max-width:880px){.mission-bell-pos{right:-8px}}
+.mission-btn{
+  width:48px;height:48px;
+  clip-path:polygon(50% 0,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);
+  border:none;cursor:pointer;
+  background:rgba(10,7,22,0.97);font-size:1.25rem;
+  display:flex;align-items:center;justify-content:center;
+  animation:m-pulse 3s ease-in-out infinite;position:relative;transition:transform .15s;
+}
+.mission-btn:active{transform:scale(.9)}
+.mission-btn.has-mission{animation:m-pulse 3s ease-in-out infinite}
+.mission-btn.no-mission{animation:none;opacity:.3}
+@keyframes m-pulse{0%,100%{box-shadow:0 0 10px rgba(200,146,26,0.22)}50%{box-shadow:0 0 22px rgba(200,146,26,0.48),0 0 0 8px rgba(200,146,26,0)}}
+.mission-dot{position:absolute;top:4px;right:8px;width:8px;height:8px;background:#ef4444;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);animation:dot-blink 1.5s ease-in-out infinite}
+@keyframes dot-blink{0%,100%{opacity:1}50%{opacity:.28}}
+.mission-popup{
+  position:absolute;top:56px;right:0;width:275px;
+  background:rgba(5,3,12,0.98);border:1px solid rgba(200,146,26,0.25);
+  padding:14px 16px;display:none;animation:mp-in .25s cubic-bezier(.175,.885,.32,1.275);
+  box-shadow:0 8px 32px rgba(0,0,0,.7),inset 0 1px 0 rgba(200,146,26,0.06);
+}
+.mission-popup.open{display:block}
+@keyframes mp-in{from{transform:scale(.9) translateY(-6px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.mission-popup::before{content:'';position:absolute;top:-6px;right:16px;width:12px;height:12px;background:rgba(5,3,12,0.98);border:1px solid rgba(200,146,26,0.2);border-right:none;border-bottom:none;transform:rotate(45deg)}
+.mp-label{font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.mp-close{background:none;border:none;color:var(--muted);font-size:.9rem;cursor:pointer;padding:0 2px;line-height:1}
+.mp-icon{font-size:1.6rem;margin-bottom:6px}
+.mp-title{font-family:'Cinzel',serif;font-size:.78rem;font-weight:700;line-height:1.3;color:var(--text)}
+.mp-desc{font-size:.68rem;color:var(--muted);margin-top:3px;line-height:1.4;font-style:italic}
+.mp-reward{display:inline-flex;gap:6px;margin-top:8px}
+.mp-reward-tag{padding:3px 9px;font-family:'Share Tech Mono',monospace;font-size:.55rem;font-weight:700;background:rgba(200,146,26,0.08);border:1px solid rgba(200,146,26,0.2);color:var(--gold)}
+.mp-reward-tag.green{background:rgba(52,211,153,0.08);border-color:rgba(52,211,153,0.2);color:#34d399}
+.mp-progress{margin-top:8px;height:3px;background:rgba(200,146,26,0.06);overflow:hidden}
+.mp-progress-bar{height:100%;transition:width 1s cubic-bezier(.4,2,.5,1)}
+.mp-go{display:block;margin-top:10px;padding:9px;border:none;width:100%;cursor:pointer;font-family:'Cinzel',serif;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:linear-gradient(135deg,#6a2f00,var(--gold));color:#0a0300;transition:all .15s}
+
+/* Book Notes */
+.bn-tab{padding:6px 12px;border:1px solid rgba(200,146,26,0.1);background:rgba(200,146,26,0.02);color:var(--muted);font-family:'Cinzel',serif;font-size:.6rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s;text-transform:uppercase;letter-spacing:.06em}
+.bn-tab.active{border-color:rgba(167,139,250,0.4);background:rgba(167,139,250,0.08);color:#c4b5fd}
+.bn-tab .bn-count{font-size:.55rem;opacity:.7;margin-left:3px}
+.bn-stats{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.bn-stat{flex:1;min-width:60px;background:rgba(200,146,26,0.03);border:1px solid rgba(200,146,26,0.08);padding:6px 8px;text-align:center}
+.bn-stat-val{font-family:'Cinzel',serif;font-size:.85rem;font-weight:700;color:#c4b5fd}
+.bn-stat-lbl{font-family:'Share Tech Mono',monospace;font-size:.53rem;color:var(--muted);margin-top:1px}
+.bn-input-row{display:flex;gap:6px;margin-bottom:10px}
+.bn-input{flex:1;background:rgba(3,2,8,0.8);border:1px solid rgba(200,146,26,0.12);color:var(--text);font-family:'IM Fell English',serif;font-size:.84rem;outline:none;resize:none;min-height:60px;line-height:1.5;padding:10px 12px;transition:border-color .2s}
+.bn-input:focus{border-color:rgba(167,139,250,0.4)}
+.bn-input::placeholder{color:var(--muted)}
+.bn-add-btn{padding:10px 14px;border:none;background:linear-gradient(135deg,#3b0d82,#7c3aed);color:#fff;cursor:pointer;font-family:'Cinzel',serif;font-size:.66rem;font-weight:700;white-space:nowrap;transition:all .15s;letter-spacing:.07em;text-transform:uppercase}
+.bn-note-item{padding:10px 12px;border:1px solid rgba(200,146,26,0.07);background:rgba(200,146,26,0.01);margin-bottom:6px}
+.bn-note-text{font-size:.84rem;line-height:1.6;color:var(--text);white-space:pre-wrap;word-break:break-word;font-style:italic}
+.bn-note-meta{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--muted)}
+.bn-note-actions{display:flex;gap:4px}
+.bn-note-btn{background:none;border:1px solid rgba(200,146,26,0.1);color:var(--muted);cursor:pointer;padding:3px 8px;font-family:'Cinzel',serif;font-size:.58rem;transition:all .15s;text-transform:uppercase}
+.bn-note-btn:hover{border-color:rgba(167,139,250,0.38);color:#c4b5fd}
+.bn-note-btn.del:hover{border-color:rgba(248,113,113,0.38);color:#f87171}
+
+#sync-status{font-family:'Share Tech Mono',monospace!important;letter-spacing:.08em}
+
+@media(min-width:600px){
+  .sg{grid-template-columns:repeat(3,1fr);gap:10px}
+  .ag{grid-template-columns:repeat(3,1fr);gap:9px}
+  .sg2{grid-template-columns:repeat(4,1fr)}
+  .nb{font-size:.52rem;padding:12px 4px 10px}
+  .card{padding:22px}
+  .rank-ring{width:88px;height:88px}
+  .streak-n{font-size:2.8rem}
+  .wk{gap:8px}
+  .wd{width:44px;height:50px;font-size:.55rem}
+}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="grid-lines"></div>
+<div class="tw" id="tw"></div>
+<!-- DAILY REVIEW POPUP -->
+<div class="review-overlay" id="review-overlay">
+  <div class="review-box">
+    <div class="review-emoji">📝</div>
+    <div class="review-title">DAILY REVIEW</div>
+    <div class="review-subtitle" id="review-subtitle">What did you learn from yesterday's reading? Write a quick review to earn bonus gaming time!</div>
+    <!-- NOTES RECALL SECTION -->
+    <div id="review-notes-section" style="display:none;margin:10px 0;border:1px solid rgba(167,139,250,0.25);background:rgba(167,139,250,0.05);border-radius:2px;overflow:hidden">
+      <div style="padding:8px 12px;font-family:'Cinzel',serif;font-size:.58rem;letter-spacing:.12em;color:#c4b5fd;border-bottom:1px solid rgba(167,139,250,0.15);display:flex;justify-content:space-between;align-items:center">
+        <span>📖 YOUR NOTES — recall before reviewing</span>
+        <button onclick="document.getElementById('review-notes-list').style.display=document.getElementById('review-notes-list').style.display==='none'?'':'none'" style="background:none;border:none;color:#c4b5fd;cursor:pointer;font-size:.7rem">▼</button>
+      </div>
+      <div id="review-notes-list" style="max-height:160px;overflow-y:auto;padding:8px 12px;display:block"></div>
+    </div>
+    <div class="review-reward-box">
+      <div class="review-reward-title">Rewards for reviewing</div>
+      <div class="review-rewards">
+        <span class="review-rw-tag game">🎮 +2m game</span>
+        <span class="review-rw-tag xp">⚡ +15 XP</span>
+      </div>
+    </div>
+    <textarea class="review-textarea" id="review-text" placeholder="Write what you remember... key ideas, favorite quotes, or what you found interesting..."></textarea>
+    <div class="review-btns">
+      <button class="review-btn skip" onclick="skipReview()">Skip today</button>
+      <button class="review-btn primary" onclick="submitReview()">Submit & Earn 🎮</button>
+    </div>
+    <div class="review-streak-bonus" id="review-streak-info"></div>
+  </div>
+</div>
+<div class="rup" id="rup">
+  <div class="rup-box">
+    <div class="rup-em" id="rup-em">👑</div>
+    <div class="rup-label">RANK UP HRANK!</div>
+    <div class="rup-name" id="rup-name">Legend I</div>
+    <div class="rup-reward" id="rup-reward">+120 min gaming bonus!</div>
+    <button class="rup-btn" onclick="closeRup()">RESUME ▶</button>
+  </div>
+</div>
+<div id="reminder-popup" style="display:none" class="popup-overlay" onclick="if(event.target===this)closePopup()">
+  <div class="popup-box">
+    <div class="popup-title">Your Progress</div>
+    <div id="popup-content"></div>
+    <button class="popup-close" onclick="closePopup()">OK, keep reading!</button>
+  </div>
+</div>
+<div class="app">
+  <div class="hdr">
+    <div class="hdr-ornament"><span class="hdr-rune">⚔ ᚱ ᚢ ᚾ ᛖ ⚔</span></div>
+    <div class="logo">⚔ ReadQuest ⚔</div>
+    <div class="logo-sub">Chronicles of Knowledge · Read · Rank Up · Conquer</div>
+    <div class="hdr-divider"></div>
+  </div>
+  <nav class="nav">
+    <button class="nb on" id="nb-home" onclick="gp('home')"><span class="nb-i">🏰</span>HOME</button>
+    <button class="nb" id="nb-timer" onclick="gp('timer')"><span class="nb-i">⏳</span>TIMER</button>
+    <button class="nb" id="nb-promo" onclick="gp('promo')"><span class="nb-i">⚔</span>RANK</button>
+    <button class="nb" id="nb-stats" onclick="gp('stats')"><span class="nb-i">📜</span>LORE</button>
+    <button class="nb" id="nb-books" onclick="gp('books')"><span class="nb-i">📖</span>TOMES</button>
+    <button class="nb" id="nb-ach" onclick="gp('ach')"><span class="nb-i">🏆</span>GLORY</button>
+    <button class="nb" id="nb-manual" onclick="gp('manual')"><span class="nb-i">⚙️</span>FORGE</button>
+  </nav>
+  <div id="sync-status" style="text-align:center;padding:5px 12px;font-size:.6rem;font-family:'Share Tech Mono',monospace;letter-spacing:.1em;background:rgba(3,2,8,0.9);color:rgba(200,146,26,0.55);border-bottom:1px solid rgba(200,146,26,0.08);transition:all .3s">⏳ Loading...</div>
+  <!-- MISSION BELL — beside the app -->
+  <div class="mission-bell-anchor">
+    <div class="mission-bell-pos">
+      <button class="mission-btn has-mission" id="mission-btn" onclick="toggleMission()">
+        🔔
+        <span class="mission-dot" id="mission-dot"></span>
+      </button>
+      <div class="mission-popup" id="mission-popup">
+        <div class="mp-label">
+          <span>🎯 CURRENT MISSION</span>
+          <button class="mp-close" onclick="toggleMission()">✕</button>
+        </div>
+        <div class="mp-icon" id="mp-icon">📖</div>
+        <div class="mp-title" id="mp-title">Read 5 minutes</div>
+        <div class="mp-desc" id="mp-desc">Start reading to earn your first gaming reward!</div>
+        <div class="mp-reward" id="mp-reward">
+          <span class="mp-reward-tag green">🎮 +10m game</span>
+          <span class="mp-reward-tag">⚡ +50 XP</span>
+        </div>
+        <div class="mp-progress"><div class="mp-progress-bar" id="mp-progress" style="width:0%;background:#f0b429"></div></div>
+        <button class="mp-go" onclick="gp('timer');toggleMission()">▶ START READING</button>
+      </div>
+    </div>
+  </div>
+  <div class="pg on" id="pg-home">
+    <div class="card">
+      <div class="ct"><span class="ct-dot"></span>CURRENT RANK</div>
+      <div class="rank-hero">
+        <div class="rank-badge">
+          <div class="rank-ring"><span id="rank-em">🥉</span></div>
+          <div class="rank-div-badge" id="rank-div">5</div>
+        </div>
+        <div class="rank-meta">
+          <div class="rank-tier-name" id="rank-tier">BRONZE 5</div>
+          <div class="rank-flavor" id="rank-flavor">Just Starting</div>
+          <div class="rank-xp-row"><span id="rank-xp-txt">0 XP</span><span id="rank-xp-next">→ 50 XP</span></div>
+          <div class="xp-bar"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+        </div>
+      </div>
+      <button class="promo-ready-btn" id="promo-btn" onclick="gp('promo')" style="display:none">⚔ READY TO RANK UP — TAP TO CHALLENGE</button>
+      <button onclick="showReminder()" style="margin-top:8px;width:100%;padding:10px;border:1px solid rgba(96,165,250,0.28);background:rgba(96,165,250,0.06);color:#93c5fd;cursor:pointer;font-size:.62rem;font-family:'Cinzel',serif;font-weight:700;letter-spacing:.1em;text-transform:uppercase;clip-path:polygon(6px 0,calc(100% - 6px) 0,100% 50%,calc(100% - 6px) 100%,6px 100%,0 50%)">📜 View Progress &amp; Chronicles</button>
+    </div>
+    <div class="sg">
+      <div class="sb"><div class="sv" style="color:#60a5fa" id="h-book">0</div><div class="sl">📚 min reading</div></div>
+      <div class="sb"><div class="sv" style="color:#34d399" id="h-game">0</div><div class="sl">🎮 budget</div></div>
+      <div class="sb"><div class="sv" style="color:#f0b429" id="h-xp">0</div><div class="sl">⚡ total XP</div></div>
+    </div>
+    <div class="card">
+      <div class="ct"><span class="ct-dot" style="background:#fb923c"></span>STREAK & MILESTONES</div>
+      <div class="streak-row">
+        <div class="fire-wrap">🔥</div>
+        <div><div class="streak-n" id="streak-n">0</div><div class="streak-lbl">DAY STREAK</div></div>
+        <div class="streak-ms" id="streak-ms"></div>
+      </div>
+      <div style="margin-top:12px"><div class="wk" id="wk"></div></div>
+    </div>
+    <div class="card">
+      <div class="ct"><span class="ct-dot" style="background:#34d399"></span>BONUS ACTIVE</div>
+      <div class="bl" id="home-bonuses"></div>
+    </div>
+    <!-- MOTIVATIONAL REMINDERS -->
+    <div class="card" id="moti-card" style="border-color:rgba(240,180,41,0.25)">
+      <div class="ct"><span class="ct-dot" style="background:#f0b429"></span>🎯 REWARDS WAITING FOR YOU</div>
+      <div id="moti-cards" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+  </div>
+  <div class="pg" id="pg-timer">
+    <div class="card">
+      <div class="mode-sw">
+        <button class="msb bk" id="msb-bk" onclick="setMode('book')">📚 READ BOOKS</button>
+        <button class="msb" id="msb-gm" onclick="setMode('game')">🎮 GAMING</button>
+      </div>
+      <div class="budget-box" style="margin-top:10px">
+        <div><div class="budget-lbl">Available gaming budget</div></div>
+        <div><span class="budget-v" id="budget-v">0</span><span style="font-size:.7rem;color:var(--muted)"> min</span></div>
+      </div>
+      <div class="clk bk-clk" id="clk">
+        <div class="clk-n" id="clk-n">00:00</div>
+        <div class="clk-sub">MIN : SEC</div>
+        <div class="clk-hint" id="clk-hint">1 min reading = 1 min gaming + tier & streak bonus</div>
+        <div class="live-mult" id="live-mult"></div>
+      </div>
+      <div class="ctrl">
+        <button class="btn-go btn-read" id="btn-go" onclick="toggleTimer()">▶ START READING</button>
+        <button class="btn-pause" id="btn-pause" onclick="pauseTimer()" disabled>⏸</button>
+        <button class="btn-stop" id="btn-stop" onclick="stopTimer()" disabled>■</button>
+      </div>
+    </div>
+
+  </div>
+  <div class="pg" id="pg-promo"><div id="promo-panel"></div></div>
+  <div class="pg" id="pg-stats">
+    <!-- Weekly bar chart -->
+    <div class="card">
+      <div class="ct"><span class="ct-dot" style="background:#60a5fa"></span>📜 CHRONICLES OF READING</div>
+      <div class="chart-wrap" id="chart-wrap">
+        <svg class="line-chart-svg" id="chart" viewBox="0 0 320 160" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+      <div id="week-best-day" style="font-size:.7rem;color:var(--muted);margin-top:10px;text-align:center;letter-spacing:.03em"></div>
+    </div>
+    <!-- Weekly summary -->
+    <div class="card">
+      <div class="ct"><span class="ct-dot" style="background:#34d399"></span>FORTNIGHT SUMMARY</div>
+      <div class="sg2" id="week-summary-grid"></div>
+    </div>
+    <!-- Day detail -->
+    <div class="card">
+      <div class="ct"><span class="ct-dot" style="background:#f0b429"></span>DAILY CHRONICLES</div>
+      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:10px" id="day-picker"></div>
+      <div id="day-detail"></div>
+    </div>
+    <!-- Overall stats -->
+    <div class="sg2">
+      <div class="sb2"><div class="sv2" style="color:#60a5fa" id="s-book">0</div><div class="sl2">📚 Total reading mins</div></div>
+      <div class="sb2"><div class="sv2" style="color:#34d399" id="s-game">0</div><div class="sl2">🎮 Total gaming mins</div></div>
+      <div class="sb2"><div class="sv2" style="color:#f0b429" id="s-xp">0</div><div class="sl2">⚡ Total XP</div></div>
+      <div class="sb2"><div class="sv2" style="color:#fb923c" id="s-streak">0</div><div class="sl2">🔥 Best Streak</div></div>
+      <div class="sb2"><div class="sv2" style="color:#a78bfa" id="s-sess">0</div><div class="sl2">📖 Reading sessions</div></div>
+      <div class="sb2"><div class="sv2" style="color:#67e8f9" id="s-avg">0</div><div class="sl2">⏱ Avg min/day</div></div>
+    </div>
+    <div class="card">
+      <div class="ct"><span class="ct-dot" style="background:#a78bfa"></span>⚔ HIERARCHY OF WARRIORS</div>
+      <div id="rank-ladder"></div>
+    </div>
+    <!-- REWARD HISTORY -->
+    <div class="card">
+      <div class="ct"><span class="ct-dot" style="background:#34d399"></span>🎁 REWARD HISTORY</div>
+      <div id="reward-history-list" style="max-height:400px;overflow-y:auto"></div>
+    </div>
+  </div>
+  <div class="pg" id="pg-books">
+    <div class="card">
+      <div class="ct"><span class="ct-dot" style="background:#60a5fa"></span>⚔ TOME COLLECTION</div>
+      <div id="book-library"></div>
+      <button class="btn-s btn-gold" style="width:100%;margin-top:10px" onclick="openAddBook()">+ ADD NEW BOOK</button>
+      <button class="btn-s" style="width:100%;margin-top:6px;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.3);color:#c4b5fd" onclick="_openReviewPopup();document.getElementById('review-text').value=''">📝 OPEN DAILY REVIEW</button>
+    </div>
+    <div class="card" id="book-form-card" style="display:none">
+      <div class="ct"><span class="ct-dot" style="background:#f0b429"></span><span id="book-form-title">ADD BOOK</span></div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <input class="inp" id="bk-ti" placeholder="Book title..."/>
+        <input class="inp" id="bk-au" placeholder="Author..."/>
+        <select class="inp" id="bk-cat" style="font-size:.82rem">
+          <option value="">— Category —</option>
+          <option value="fiction">📖 Fiction</option>
+          <option value="nonfiction">📚 Non-Fiction</option>
+          <option value="foreign">🌐 Ngoại ngữ / Foreign Language</option>
+          <option value="selfhelp">💡 Self-Help / Development</option>
+          <option value="business">💼 Business / Finance</option>
+          <option value="technical">⚙️ Technical / Science</option>
+          <option value="other">📝 Other</option>
+        </select>
+        <div class="fg">
+          <span style="font-size:.78rem;color:var(--muted);line-height:2.4">Page</span>
+          <input class="inp" id="bk-pg" type="number" min="0" placeholder="0" style="width:72px"/>
+          <span class="pg-slash">/</span>
+          <input class="inp" id="bk-tot" type="number" min="1" placeholder="300" style="width:72px"/>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="btn-s" style="background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--muted);flex:1" onclick="closeBookForm()">CANCEL</button>
+          <button class="btn-s btn-gold" style="flex:2" onclick="saveBook()">💾 SAVE</button>
+        </div>
+      </div>
+    </div>
+    <!-- BOOK NOTES SECTION -->
+    <div class="card" id="book-notes-card">
+      <div class="ct"><span class="ct-dot" style="background:#a78bfa"></span>📝 BOOK NOTES</div>
+      <div id="book-notes-tabs" style="display:flex;gap:5px;overflow-x:auto;padding-bottom:8px;margin-bottom:10px"></div>
+      <div id="book-notes-area">
+        <div style="font-size:.82rem;color:var(--muted);text-align:center;padding:16px 0">Select a book above to view & add notes</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct"><span class="ct-dot" style="background:#34d399"></span>📜 CHRONICLES OF READING</div>
+      <div class="sess-list" id="sess-list"></div>
+    </div>
+  </div>
+  <div class="pg" id="pg-manual">
+    <div class="card">
+      <div class="ct"><span class="ct-dot" style="background:#60a5fa"></span>📜 SCRIBE ENTRY</div>
+      <p style="font-size:.78rem;color:var(--muted);margin-bottom:12px;line-height:1.6">Use when reading without your phone — enter minutes read to earn gaming time.</p>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+        <input class="inp" id="manual-read-mins" type="number" min="1" max="480" placeholder="Minutes read..." style="flex:1"/>
+        <span style="color:var(--muted);font-size:.8rem">min</span>
+      </div>
+      <input class="inp" id="manual-read-note" placeholder="Note (optional)..." style="margin-bottom:10px"/>
+      <div id="manual-read-preview" style="font-size:.75rem;color:#34d399;margin-bottom:10px;min-height:18px"></div>
+      <button class="btn-s btn-gold" style="width:100%;padding:12px" onclick="manualAddRead()">📚 ADD TO READING LOG</button>
+    </div>
+    <div class="card">
+      <div class="ct"><span class="ct-dot" style="background:#34d399"></span>⚔ TRIBUTE PAYMENT</div>
+      <p style="font-size:.78rem;color:var(--muted);margin-bottom:12px;line-height:1.6">Use when you gamed without the timer — deduct manually to balance your budget.</p>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+        <input class="inp" id="manual-game-mins" type="number" min="1" max="480" placeholder="Minutes played..." style="flex:1"/>
+        <span style="color:var(--muted);font-size:.8rem">min</span>
+      </div>
+      <div id="manual-game-preview" style="font-size:.75rem;color:#f87171;margin-bottom:10px;min-height:18px"></div>
+      <button class="btn-s btn-red" style="width:100%;padding:12px;border:none" onclick="manualDeductGame()">🎮 DEDUCT FROM GAME BUDGET</button>
+    </div>
+    <div class="card" id="frozen-card">
+      <div class="ct"><span class="ct-dot" style="background:#67e8f9"></span>❄️ FROZEN STREAK — PROTECT WHILE TRAVELLING</div>
+      <p style="font-size:.78rem;color:var(--muted);margin-bottom:12px;line-height:1.6">Activate before travelling so your streak is protected. Streak will be frozen for the duration you choose.</p>
+      <div id="frozen-status"></div>
+      <div id="frozen-controls"></div>
+    </div>
+    <div class="card" id="migrate-card" style="border-color:rgba(103,232,249,0.25)">
+      <div class="ct"><span class="ct-dot" style="background:#67e8f9"></span>🕐 FIX SESSION DATE</div>
+      <p style="font-size:.78rem;color:var(--muted);margin-bottom:12px;line-height:1.6">Move selected sessions from one date to another. Streak will be recalculated automatically.</p>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+        <input class="inp" id="migrate-from" type="date" style="flex:1" oninput="renderMigrateSessionList()"/>
+        <span style="color:var(--muted);font-size:1rem">→</span>
+        <input class="inp" id="migrate-to" type="date" style="flex:1"/>
+      </div>
+      <div id="migrate-session-list" style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px"></div>
+      <button class="btn-s" style="width:100%;padding:12px;background:linear-gradient(135deg,#0891b2,#67e8f9);color:#000;border:none;font-weight:700;font-family:'Cinzel',serif;letter-spacing:.08em;clip-path:polygon(6px 0,calc(100% - 6px) 0,100% 50%,calc(100% - 6px) 100%,6px 100%,0 50%)" onclick="migrateDate()">🔄 MOVE SELECTED SESSIONS</button>
+    </div>
+    <div class="card" style="border-color:rgba(52,211,153,0.25)">
+      <div class="ct"><span class="ct-dot" style="background:#34d399"></span>💾 BACKUP & RESTORE</div>
+      <p style="font-size:.78rem;color:var(--muted);margin-bottom:14px;line-height:1.6">Export toàn bộ dữ liệu ra file JSON để backup hoặc chuyển sang thiết bị khác. Import để khôi phục.</p>
+      <button class="btn-s" style="width:100%;padding:12px;margin-bottom:8px;background:linear-gradient(135deg,#064e3b,#065f46,#059669);color:#d1fae5;border:none;font-family:'Cinzel',serif;font-weight:700;letter-spacing:.08em;font-size:.68rem;clip-path:polygon(6px 0,calc(100% - 6px) 0,100% 50%,calc(100% - 6px) 100%,6px 100%,0 50%)" onclick="exportData()">📤 EXPORT DATA — TẢI FILE BACKUP</button>
+      <div style="position:relative;width:100%">
+        <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)"/>
+        <button class="btn-s" style="width:100%;padding:12px;background:linear-gradient(135deg,#1e1b4b,#3730a3,#4f46e5);color:#e0e7ff;border:none;font-family:'Cinzel',serif;font-weight:700;letter-spacing:.08em;font-size:.68rem;clip-path:polygon(6px 0,calc(100% - 6px) 0,100% 50%,calc(100% - 6px) 100%,6px 100%,0 50%)" onclick="document.getElementById('import-file').click()">📥 IMPORT DATA — KHÔI PHỤC TỪ FILE</button>
+      </div>
+      <div id="import-status" style="margin-top:8px;font-size:.72rem;color:var(--muted);text-align:center;min-height:16px"></div>
+    </div>
+    <div class="card" style="border-color:rgba(239,68,68,0.25)">
+      <div class="ct"><span class="ct-dot" style="background:#ef4444"></span>☠ DANGER ZONE</div>
+      <p style="font-size:.78rem;color:var(--muted);margin-bottom:12px;line-height:1.6">Reset will delete all progress, rank, streak, and reading data. This cannot be undone.</p>
+      <button class="btn-s btn-red" style="width:100%;padding:12px" onclick="confirmReset()">🗑 RESET ALL DATA</button>
+    </div>
+  </div>
+  <div class="pg" id="pg-ach">
+    <div class="card">
+      <div class="ct"><span class="ct-dot" style="background:#f0b429"></span>ACHIEVEMENTS</div>
+      <div id="note-stats-bar" style="display:flex;gap:6px;margin-bottom:2px;flex-wrap:wrap"></div>
+      <div style="font-size:.78rem;color:var(--muted);margin-bottom:10px">Unlocked: <span id="ach-cnt" style="color:#f0b429;font-weight:700">0</span> / <span id="ach-tot">0</span></div>
+      <div class="ag" id="ach-grid"></div>
+    </div>
+  </div>
+</div>
+<script>
+// CONVERSION RATES: baseConv = phút đọc → phút game (càng lên cao càng ít hơn)
+// Warrior: 0.80x | Elite: 0.72x | Master: 0.64x | Grandmaster: 0.56x | Epic: 0.48x | Legend: 0.40x
+const TIERS=[
+  {id:'warrior',name:'WARRIOR',emoji:'⚔️',color:'#a3a3a3',glow:'rgba(163,163,163,.18)',xpPerDiv:50,minRead:10,promoDays:2,minStreak:3,divDays:2,divMinPerDay:10,baseConv:0.80,rewardMult:1.0,flavor:['First Blood!','Picking Up the Sword','Learning the Basics','Battle Hardened','Ready to Advance']},
+  {id:'elite',name:'ELITE',emoji:'🛡️',color:'#60a5fa',glow:'rgba(96,165,250,.15)',xpPerDiv:100,minRead:15,promoDays:3,minStreak:5,divDays:3,divMinPerDay:15,baseConv:0.72,rewardMult:1.3,flavor:['Sharpening Skills','Holding the Line','Elite Instincts','Pages as Weapons','Almost a Master']},
+  {id:'master',name:'MASTER',emoji:'🗡️',color:'#f0b429',glow:'rgba(240,180,41,.15)',xpPerDiv:200,minRead:20,promoDays:4,minStreak:7,divDays:4,divMinPerDay:20,baseConv:0.64,rewardMult:1.6,flavor:['Master of the Craft','Tactical Reader','Pages Conquered','Knowledge Mastered','Master at Heart']},
+  {id:'grandmaster',name:'GRANDMASTER',emoji:'💜',color:'#c084fc',glow:'rgba(192,132,252,.18)',xpPerDiv:400,minRead:25,promoDays:5,minStreak:10,divDays:5,divMinPerDay:25,baseConv:0.56,rewardMult:2.0,flavor:['Grand Ambitions','Strategy Unlocked','Reading the Meta','Few Can Match This','Almost Epic']},
+  {id:'epic',name:'EPIC',emoji:'💎',color:'#67e8f9',glow:'rgba(103,232,249,.18)',xpPerDiv:700,minRead:30,promoDays:7,minStreak:14,divDays:5,divMinPerDay:30,baseConv:0.48,rewardMult:2.5,flavor:['Epic Dedication','Rare & Powerful','Beyond Ordinary','Near Mythical','One Step to Legend']},
+  {id:'legend',name:'LEGEND',emoji:'👑',color:'#f97316',glow:'rgba(249,115,22,.20)',xpPerDiv:1200,minRead:45,promoDays:10,minStreak:21,divDays:7,divMinPerDay:45,baseConv:0.40,rewardMult:3.2,flavor:['Legend Awakens','Legend Rising','Legend Ascendant','Legend Supreme','LEGEND — CROWNED']},
+  {id:'mythic',name:'MYTHIC',emoji:'🔱',color:'#e879f9',glow:'rgba(232,121,249,.20)',xpPerDiv:1800,minRead:50,promoDays:14,minStreak:30,divDays:7,divMinPerDay:50,baseConv:0.35,rewardMult:3.8,flavor:['Mythic Dawn','Mythic Forge','Mythic Pulse','Mythic Core','MYTHIC — ASCENDED']},
+  {id:'immortal',name:'IMMORTAL',emoji:'⚡',color:'#facc15',glow:'rgba(250,204,21,.22)',xpPerDiv:2500,minRead:60,promoDays:21,minStreak:45,divDays:10,divMinPerDay:60,baseConv:0.30,rewardMult:4.5,flavor:['Immortal Spark','Immortal Flame','Immortal Blaze','Immortal Inferno','IMMORTAL — ETERNAL']},
+  {id:'transcendent',name:'TRANSCENDENT',emoji:'🌌',color:'#38bdf8',glow:'rgba(56,189,248,.22)',xpPerDiv:4000,minRead:90,promoDays:30,minStreak:60,divDays:14,divMinPerDay:90,baseConv:0.25,rewardMult:5.5,flavor:['Beyond Mortal','Beyond Time','Beyond Space','Beyond All','TRANSCENDENT — INFINITE']},
+];
+const STREAK_MILESTONES=[{days:3,gameBonus:5,label:'3 days +5m'},{days:7,gameBonus:10,label:'7 days +10m'},{days:14,gameBonus:15,label:'14 days +15m'},{days:21,gameBonus:20,label:'21 days +20m'},{days:30,gameBonus:30,label:'30 days +30m'}];
+const ACHIEVEMENTS=[
+  // ── First steps (game:0, XP only — just getting started) ──
+  {id:'first',   icon:'📖',name:'First Steps',    desc:'Complete your first reading session', color:'#60a5fa', reward:{game:0,xp:20},   check:s=>s.sessCount>=1},
+  {id:'sess3',   icon:'📗',name:'Getting Started', desc:'Complete 3 reading sessions',        color:'#60a5fa', reward:{game:0,xp:30},   check:s=>s.sessCount>=3},
+  {id:'sess5',   icon:'📘',name:'5 Sessions',      desc:'Complete 5 reading sessions',        color:'#60a5fa', reward:{game:0,xp:40},   check:s=>s.sessCount>=5},
+  {id:'sess10',  icon:'📚',name:'10 Sessions',    desc:'Complete 10 reading sessions',        color:'#60a5fa', reward:{game:0,xp:60},  check:s=>s.sessCount>=10},
+  {id:'sess25',  icon:'📖',name:'25 Sessions',    desc:'Complete 25 reading sessions',        color:'#a78bfa', reward:{game:5,xp:100},  check:s=>s.sessCount>=25},
+  {id:'sess50',  icon:'📦',name:'50 Sessions',    desc:'Complete 50 reading sessions',        color:'#a78bfa', reward:{game:10,xp:200},  check:s=>s.sessCount>=50},
+  {id:'sess100', icon:'🏛',name:'100 Sessions',   desc:'Complete 100 reading sessions',       color:'#f0b429', reward:{game:15,xp:400}, check:s=>s.sessCount>=100},
+  {id:'sess200', icon:'🌟',name:'200 Sessions',   desc:'Complete 200 reading sessions',       color:'#f97316', reward:{game:20,xp:600},check:s=>s.sessCount>=200},
+  {id:'sess500', icon:'👑',name:'500 Sessions',   desc:'Complete 500 reading sessions',       color:'#f97316', reward:{game:30,xp:1000},check:s=>s.sessCount>=500},
+
+  // ── Single session length — small token for early milestones, bigger for long reads ──
+  {id:'m5',  icon:'⏳',name:'5 Min Warm-up',  desc:'Read 5 min in one session',  color:'#86efac', reward:{game:0.5,xp:10},  check:s=>s.maxSess>=5},
+  {id:'m10', icon:'⏱',name:'10 Min Session', desc:'Read 10 min in one session', color:'#34d399', reward:{game:0.5,xp:20},  check:s=>s.maxSess>=10},
+  {id:'m15', icon:'🕐',name:'15 Min Focus',  desc:'Read 15 min in one session', color:'#34d399', reward:{game:1,  xp:30},  check:s=>s.maxSess>=15},
+  {id:'m20', icon:'🕑',name:'20 Min Solid',  desc:'Read 20 min in one session', color:'#34d399', reward:{game:1,  xp:40},  check:s=>s.maxSess>=20},
+  {id:'m30', icon:'🕒',name:'30 Min Session', desc:'Read 30 min in one session', color:'#34d399', reward:{game:1,  xp:60},  check:s=>s.maxSess>=30},
+  {id:'m45', icon:'🕓',name:'45 Min Deep',   desc:'Read 45 min in one session', color:'#f0b429', reward:{game:5,  xp:80},  check:s=>s.maxSess>=45},
+  {id:'m60', icon:'⌛',name:'One Hour',        desc:'Read 60 min in one session', color:'#f0b429', reward:{game:10, xp:100}, check:s=>s.maxSess>=60},
+  {id:'m90', icon:'💪',name:'90 Min Beast',   desc:'Read 90 min in one session', color:'#f97316', reward:{game:20, xp:150}, check:s=>s.maxSess>=90},
+  {id:'m120',icon:'🔥',name:'2 Hour Marathon',desc:'Read 120 min in one session',color:'#f97316', reward:{game:30, xp:200}, check:s=>s.maxSess>=120},
+  {id:'m180',icon:'🐉',name:'3 Hour Dragon', desc:'Read 180 min in one session',color:'#67e8f9', reward:{game:45, xp:300}, check:s=>s.maxSess>=180},
+
+  // ── Total minutes — token nhỏ sớm, tăng dần ở mốc lớn ──
+  {id:'t30',   icon:'🌱',name:'30 Minutes',    desc:'30 total minutes read',    color:'#86efac', reward:{game:0.5,xp:20},   check:s=>s.totalBook>=30},
+  {id:'t60',   icon:'🌿',name:'1 Hour Total',  desc:'60 total minutes read',    color:'#86efac', reward:{game:0.5,xp:30},   check:s=>s.totalBook>=60},
+  {id:'t100',  icon:'🌱',name:'100 Minutes',   desc:'100 total minutes read',   color:'#86efac', reward:{game:1,  xp:50},   check:s=>s.totalBook>=100},
+  {id:'t200',  icon:'🌿',name:'200 Minutes',   desc:'200 total minutes read',   color:'#34d399', reward:{game:1,  xp:80},   check:s=>s.totalBook>=200},
+  {id:'t300',  icon:'🍀',name:'300 Minutes',   desc:'300 total minutes read',   color:'#34d399', reward:{game:2,  xp:100},  check:s=>s.totalBook>=300},
+  {id:'t500',  icon:'📘',name:'500 Minutes',   desc:'500 total minutes read',   color:'#60a5fa', reward:{game:5,  xp:150},  check:s=>s.totalBook>=500},
+  {id:'t1000', icon:'📕',name:'1000 Minutes',  desc:'1,000 total minutes read', color:'#f0b429', reward:{game:15, xp:300},  check:s=>s.totalBook>=1000},
+  {id:'t2000', icon:'📦',name:'2000 Minutes',  desc:'2,000 total minutes read', color:'#fb923c', reward:{game:25, xp:500},  check:s=>s.totalBook>=2000},
+  {id:'t5000', icon:'💎',name:'5000 Minutes',  desc:'5,000 total minutes read', color:'#67e8f9', reward:{game:40, xp:1000}, check:s=>s.totalBook>=5000},
+  {id:'t10000',icon:'👑',name:'10,000 Minutes',desc:'10,000 total minutes read',color:'#f97316', reward:{game:60, xp:2000}, check:s=>s.totalBook>=10000},
+
+  // ── Streaks — mốc nhỏ token nhỏ, streak dài thưởng lớn (core mechanic) ──
+  {id:'s2',  icon:'🔥',name:'On a Roll',     desc:'2-day streak',   color:'#fb923c', reward:{game:0.5,xp:15},  check:s=>s.bestStreak>=2},
+  {id:'s3',  icon:'🔥',name:'On Fire',      desc:'3-day streak',   color:'#fb923c', reward:{game:0.5,xp:25},  check:s=>s.bestStreak>=3},
+  {id:'s5',  icon:'⚡',name:'5-Day Streak', desc:'5-day streak',   color:'#f0b429', reward:{game:1,  xp:40},  check:s=>s.bestStreak>=5},
+  {id:'s7',  icon:'🌟',name:'Golden Week',  desc:'7-day streak',   color:'#f0b429', reward:{game:5,  xp:60},  check:s=>s.bestStreak>=7},
+  {id:'s14', icon:'💫',name:'Two Weeks',    desc:'14-day streak',  color:'#a78bfa', reward:{game:10, xp:100}, check:s=>s.bestStreak>=14},
+  {id:'s21', icon:'🌈',name:'21-Day Habit', desc:'21-day streak — habit formed!', color:'#a78bfa', reward:{game:15, xp:200}, check:s=>s.bestStreak>=21},
+  {id:'s30', icon:'🌙',name:'One Month',    desc:'30-day streak',  color:'#67e8f9', reward:{game:25, xp:300}, check:s=>s.bestStreak>=30},
+  {id:'s60', icon:'🌊',name:'Two Months',   desc:'60-day streak',  color:'#67e8f9', reward:{game:40, xp:500}, check:s=>s.bestStreak>=60},
+  {id:'s100',icon:'⚡',name:'Century Streak',desc:'100-day streak',color:'#f97316', reward:{game:60, xp:800}, check:s=>s.bestStreak>=100},
+  {id:'s365',icon:'👑',name:'Full Year',    desc:'365-day streak!',color:'#f97316', reward:{game:120,xp:3000}, check:s=>s.bestStreak>=365},
+
+  // ── Rank — thêm token nhỏ, đây là effort thực ──
+  {id:'elite_r', icon:'🛡️',name:'Elite',       desc:'Reach Elite rank',       color:'#60a5fa', reward:{game:2,  xp:100},  check:s=>s.ri>=5},
+  {id:'master_r',icon:'🗡️',name:'Master',      desc:'Reach Master rank',      color:'#f0b429', reward:{game:5,  xp:200},  check:s=>s.ri>=10},
+  {id:'gm_r',   icon:'💜',name:'Grandmaster', desc:'Reach Grandmaster rank', color:'#c084fc', reward:{game:10, xp:400},  check:s=>s.ri>=15},
+  {id:'epic_r', icon:'💎',name:'Epic',         desc:'Reach Epic rank',        color:'#67e8f9', reward:{game:15, xp:600},  check:s=>s.ri>=20},
+  {id:'leg_r',  icon:'👑',name:'Legend',       desc:'Reach Legend rank',      color:'#f97316', reward:{game:20, xp:1000}, check:s=>s.ri>=25},
+
+  // ── Promotion challenges ──
+  {id:'promo1', icon:'⚔️',name:'First Victory', desc:'Win your first promo challenge', color:'#f0b429', reward:{game:5,  xp:100}, check:s=>s.promosWon>=1},
+  {id:'promo3', icon:'🗡️',name:'Triple Crown',   desc:'Win 3 promo challenges',        color:'#fb923c', reward:{game:10, xp:200}, check:s=>s.promosWon>=3},
+  {id:'promo5', icon:'🗡️',name:'Battle Hardened',desc:'Win 5 promo challenges',        color:'#fb923c', reward:{game:15, xp:300}, check:s=>s.promosWon>=5},
+
+  // ── Books ──
+  {id:'book1',  icon:'✅',name:'First Book',   desc:'Finish your first book', color:'#34d399', reward:{game:5,  xp:80},  check:s=>s.booksFinished>=1},
+  {id:'book3',  icon:'📚',name:'Trilogy',      desc:'Finish 3 books',         color:'#34d399', reward:{game:10, xp:150}, check:s=>s.booksFinished>=3},
+  {id:'book5',  icon:'📖',name:'5 Books',      desc:'Finish 5 books',         color:'#60a5fa', reward:{game:15, xp:250}, check:s=>s.booksFinished>=5},
+  {id:'book10', icon:'🏛',name:'Library',      desc:'Finish 10 books',        color:'#f0b429', reward:{game:25, xp:400}, check:s=>s.booksFinished>=10},
+  {id:'book20', icon:'🏰',name:'Grand Library',desc:'Finish 20 books',        color:'#f97316', reward:{game:40, xp:600}, check:s=>s.booksFinished>=20},
+
+  // ── Notes (XP chính, game token nhỏ ở mốc có effort) ──
+  {id:'notes1',  icon:'✏️', name:'First Thought',   desc:'Write your very first note',          color:'#c084fc', reward:{game:0.5,xp:20},  check:s=>(s.notedSess||0)>=1},
+  {id:'notes5',  icon:'📝', name:'Note Taker',       desc:'Write notes after 5 sessions',        color:'#a78bfa', reward:{game:0.5,xp:40},  check:s=>(s.notedSess||0)>=5},
+  {id:'notes10', icon:'📓', name:'Note Keeper',      desc:'Write notes after 10 sessions',       color:'#a78bfa', reward:{game:1,  xp:60},  check:s=>(s.notedSess||0)>=10},
+  {id:'notes25', icon:'📔', name:'Consistent Writer',desc:'Write notes after 25 sessions',       color:'#a78bfa', reward:{game:5,  xp:120}, check:s=>(s.notedSess||0)>=25},
+  {id:'notes50', icon:'📒', name:'Journalist',       desc:'Write notes after 50 sessions',       color:'#c084fc', reward:{game:10, xp:250}, check:s=>(s.notedSess||0)>=50},
+  {id:'notes100',icon:'🗞', name:'Chronicler',       desc:'Write notes after 100 sessions',      color:'#f0b429', reward:{game:15, xp:500}, check:s=>(s.notedSess||0)>=100},
+
+  // ── Note depth ──
+  {id:'nw200', icon:'🌿',name:'Growing Ideas',       desc:'Write 200+ total words in notes',      color:'#34d399', reward:{game:0.5,xp:40},  check:s=>(s.totalNoteWords||0)>=200},
+  {id:'nw500', icon:'🌳',name:'Deep Thinker',        desc:'Write 500+ total words in notes',      color:'#34d399', reward:{game:1,  xp:80},  check:s=>(s.totalNoteWords||0)>=500},
+  {id:'nw1000',icon:'📜',name:'Philosopher',         desc:'Write 1,000+ total words in notes',    color:'#a78bfa', reward:{game:2,  xp:150}, check:s=>(s.totalNoteWords||0)>=1000},
+  {id:'nw5000',icon:'🏛',name:'Grand Scribe',        desc:'Write 5,000+ total words in notes',    color:'#f0b429', reward:{game:10, xp:400}, check:s=>(s.totalNoteWords||0)>=5000},
+
+  // ── Note Streak ──
+  {id:'ns3', icon:'💬',name:'3-Day Reflector',  desc:'Write notes 3 days in a row',    color:'#fb923c', reward:{game:0.5,xp:30},  check:s=>(s.bestNoteStreak||0)>=3},
+  {id:'ns7', icon:'🗣',name:'Weekly Reviewer',  desc:'Write notes 7 days in a row',    color:'#f0b429', reward:{game:1,  xp:60},  check:s=>(s.bestNoteStreak||0)>=7},
+  {id:'ns14',icon:'📣',name:'Fortnight Focus',  desc:'Write notes 14 days in a row',   color:'#a78bfa', reward:{game:2,  xp:120}, check:s=>(s.bestNoteStreak||0)>=14},
+  {id:'ns30',icon:'🎙',name:'Daily Journaller', desc:'Write notes 30 days in a row',   color:'#67e8f9', reward:{game:5,  xp:250}, check:s=>(s.bestNoteStreak||0)>=30},
+
+  // ── Note Quality ──
+  {id:'nl50', icon:'💡',name:'Good Insight',     desc:'Write a single note over 50 chars',   color:'#fde68a', reward:{game:0.5,xp:20},  check:s=>(s.longestNote||0)>=50},
+  {id:'nl150',icon:'💭',name:'Deep Reflection',  desc:'Write a single note over 150 chars',  color:'#c084fc', reward:{game:0.5,xp:50},  check:s=>(s.longestNote||0)>=150},
+  {id:'nl500',icon:'🔬',name:'Essay Writer',     desc:'Write a single note over 500 chars',  color:'#f0b429', reward:{game:1,  xp:150}, check:s=>(s.longestNote||0)>=500},
+
+  // ── Book Notes per-book ──
+  {id:'bn1',   icon:'📕',name:'Book Annotator',    desc:'Write notes for 1 book',              color:'#60a5fa', reward:{game:0.5,xp:20},  check:function(s){if(!s.bookNotes)return false;var c=0;Object.keys(s.bookNotes).forEach(function(k){if(s.bookNotes[k]&&s.bookNotes[k].length>=1)c++;});return c>=1;}},
+  {id:'bn3',   icon:'📗',name:'Multi-Book Notes',  desc:'Write notes for 3 different books',   color:'#34d399', reward:{game:1,  xp:60},  check:function(s){if(!s.bookNotes)return false;var c=0;Object.keys(s.bookNotes).forEach(function(k){if(s.bookNotes[k]&&s.bookNotes[k].length>=1)c++;});return c>=3;}},
+  {id:'bn5',   icon:'📘',name:'Prolific Annotator', desc:'Write notes for 5 different books',   color:'#a78bfa', reward:{game:5,  xp:120}, check:function(s){if(!s.bookNotes)return false;var c=0;Object.keys(s.bookNotes).forEach(function(k){if(s.bookNotes[k]&&s.bookNotes[k].length>=1)c++;});return c>=5;}},
+  {id:'bnd10', icon:'🔖',name:'Deep Reader',        desc:'Write 10+ notes for a single book',   color:'#a78bfa', reward:{game:1,  xp:80},  check:function(s){if(!s.bookNotes)return false;return Object.keys(s.bookNotes).some(function(k){return s.bookNotes[k]&&s.bookNotes[k].length>=10;});}},
+  {id:'bnd25', icon:'📑',name:'Book Scholar',        desc:'Write 25+ notes for a single book',   color:'#f0b429', reward:{game:5,  xp:200}, check:function(s){if(!s.bookNotes)return false;return Object.keys(s.bookNotes).some(function(k){return s.bookNotes[k]&&s.bookNotes[k].length>=25;});}},
+  {id:'bnw500',icon:'✍️',name:'Book Essayist',       desc:'Write 500+ words of notes for 1 book',color:'#c084fc', reward:{game:2,  xp:100}, check:function(s){if(!s.bookNotes)return false;return Object.keys(s.bookNotes).some(function(k){var w=0;(s.bookNotes[k]||[]).forEach(function(n){w+=(n.words||0);});return w>=500;});}},
+  {id:'bnw2k', icon:'🏛',name:'Book Thesis',         desc:'Write 2000+ words of notes for 1 book',color:'#f97316',reward:{game:10, xp:300}, check:function(s){if(!s.bookNotes)return false;return Object.keys(s.bookNotes).some(function(k){var w=0;(s.bookNotes[k]||[]).forEach(function(n){w+=(n.words||0);});return w>=2000;});}},
+
+  // ── Daily Review (token nhỏ — effort thấp) ──
+  {id:'rev1',  icon:'📝',name:'First Review',     desc:'Complete your first daily review',       color:'#86efac', reward:{game:0.5,xp:15},  check:s=>(s.reviewCount||0)>=1},
+  {id:'rev3',  icon:'📋',name:'Reviewer',          desc:'Complete 3 daily reviews',               color:'#34d399', reward:{game:0.5,xp:30},  check:s=>(s.reviewCount||0)>=3},
+  {id:'rev7',  icon:'🔄',name:'Weekly Reviewer',   desc:'Complete 7 daily reviews',               color:'#60a5fa', reward:{game:1,  xp:60},  check:s=>(s.reviewCount||0)>=7},
+  {id:'rev14', icon:'🧠',name:'Memory Builder',    desc:'Complete 14 daily reviews',              color:'#a78bfa', reward:{game:5,  xp:120}, check:s=>(s.reviewCount||0)>=14},
+  {id:'rev30', icon:'🎓',name:'Scholar Reviewer',  desc:'Complete 30 daily reviews',              color:'#f0b429', reward:{game:10, xp:250}, check:s=>(s.reviewCount||0)>=30},
+  {id:'rev60', icon:'🏛',name:'Master Reviewer',   desc:'Complete 60 daily reviews',              color:'#f97316', reward:{game:15, xp:500}, check:s=>(s.reviewCount||0)>=60},
+
+  // ── Review Streak ──
+  {id:'rs3',   icon:'🔥',name:'3-Day Recall',      desc:'Review 3 days in a row',                color:'#fb923c', reward:{game:0.5,xp:30},  check:s=>(s.bestReviewStreak||0)>=3},
+  {id:'rs7',   icon:'⚡',name:'Weekly Recall',      desc:'Review 7 days in a row',                color:'#f0b429', reward:{game:1,  xp:60},  check:s=>(s.bestReviewStreak||0)>=7},
+  {id:'rs14',  icon:'💫',name:'Fortnight Recall',   desc:'Review 14 days in a row',               color:'#a78bfa', reward:{game:2,  xp:120}, check:s=>(s.bestReviewStreak||0)>=14},
+  {id:'rs30',  icon:'🌟',name:'Monthly Recall',     desc:'Review 30 days in a row',               color:'#67e8f9', reward:{game:5,  xp:250}, check:s=>(s.bestReviewStreak||0)>=30},
+
+  // ── Review Quality ──
+  {id:'rw100', icon:'💬',name:'Brief Recap',        desc:'Write 100+ total words in reviews',     color:'#86efac', reward:{game:0.5,xp:20},  check:s=>(s.totalReviewWords||0)>=100},
+  {id:'rw500', icon:'📖',name:'Thoughtful Reviewer',desc:'Write 500+ total words in reviews',     color:'#34d399', reward:{game:1,  xp:60},  check:s=>(s.totalReviewWords||0)>=500},
+  {id:'rw2000',icon:'📚',name:'Deep Recall Master', desc:'Write 2,000+ total words in reviews',   color:'#f0b429', reward:{game:5,  xp:200}, check:s=>(s.totalReviewWords||0)>=2000},
+];
+// ═══ REWARD HISTORY ═══
+function addRewardHistory(type,desc,gameMins,xp){
+  if(!S.rewardHistory)S.rewardHistory=[];
+  S.rewardHistory.unshift({type:type,desc:desc,game:gameMins||0,xp:xp||0,date:typeof today==='function'?today():'',ts:Date.now()});
+  if(S.rewardHistory.length>200)S.rewardHistory=S.rewardHistory.slice(0,200);
+}
+function defState(){return{ri:0,totalBook:0,totalGame:0,gameBudget:0,totalXP:0,streak:0,bestStreak:0,lastDate:'',weekDays:{},dailyMins:{},sessCount:0,maxSess:0,sessions:[],currentBook:{title:'',author:'',page:0,total:0},books:[],achievements:{},claimedSM:[],booksFinished:0,notedSess:0,totalNoteWords:0,longestNote:0,noteStreak:0,bestNoteStreak:0,lastNotedDate:'',promosWon:0,promo:null,frozenStreak:null,activeBookId:null,reviewCount:0,reviewStreak:0,bestReviewStreak:0,lastReviewDate:'',totalReviewWords:0,lastReviewPopupDate:'',reviews:[],lastLootBoxDate:'',divProgress:{days:[],ri:0},rewardHistory:[]};}
+let S=defState();
+
+function syncBar(status,msg){
+  const el=document.getElementById('sync-status');
+  if(!el)return;
+  const styles={
+    loading:'background:#1e293b;color:#94a3b8',
+    ok:'background:rgba(52,211,153,0.1);color:#34d399',
+    err:'background:rgba(239,68,68,0.1);color:#f87171',
+    save:'background:rgba(96,165,250,0.1);color:#60a5fa'
+  };
+  el.style.cssText=(styles[status]||styles.ok)+';text-align:center;padding:5px 12px;font-size:.65rem;font-family:Share Tech Mono,monospace;letter-spacing:.08em;transition:all .3s';
+  el.textContent=msg;
+}
+
+async function cloudLoad(){
+  syncBar('loading','⏳ Loading data...');
+  try{
+    const r=await window.storage.get('rq3_state');
+    if(r&&r.value){
+      S=JSON.parse(r.value);
+      syncBar('ok','☁ Synced — all devices share this data');
+    } else {
+      syncBar('ok','☁ New data — ready to sync');
+    }
+  } catch(e){
+    // Fallback to localStorage
+    try{
+      const lc=localStorage.getItem('rq3');
+      if(lc){S=JSON.parse(lc);}
+      syncBar('err','! Offline — using local data');
+    } catch(_){
+      syncBar('err','! Could not load data');
+    }
+  }
+  // Migrate legacy single book to books array
+  if(!S.books)S.books=[];
+  if(!S.bookNotes)S.bookNotes={};
+  if(!S.divProgress)S.divProgress={days:[],ri:S.ri||0};
+  if(!S.rewardHistory)S.rewardHistory=[];
+  if(S.currentBook&&S.currentBook.title&&!S.books.length){
+    const migId='bk_migrated';
+    S.books.push({id:migId,title:S.currentBook.title,author:S.currentBook.author||'',page:S.currentBook.page||0,total:S.currentBook.total||0,done:false,added:S.lastDate||today()});
+    S.activeBookId=migId;
+  }
+  checkFrozenExpiry();recalcStreak();renderHome();setMode('book');checkAch();
+  // Restore paused timer if it was saved
+  if(S._timerState&&S._timerState.elapsedMs>0){
+    var ts=S._timerState;
+    mode=ts.mode||'book';
+    _elapsedMs=ts.elapsedMs;
+    _gameBudgetAtStart=ts.gameBudgetAtStart||S.gameBudget;
+    _gameTotalAtStart=ts.gameTotalAtStart||S.totalGame;
+    paused=true;running=false;_startTs=0;
+    // Restore UI to paused state
+    setMode(mode);// This resets _elapsedMs, so re-set it after
+    _elapsedMs=ts.elapsedMs;
+    paused=true;
+    document.getElementById('btn-pause').disabled=false;
+    document.getElementById('btn-pause').className='btn-pause paused';
+    document.getElementById('btn-pause').textContent='▶';
+    document.getElementById('btn-go').disabled=false;
+    document.getElementById('btn-go').textContent='▶ RESUME';
+    document.getElementById('btn-stop').disabled=false;
+    document.getElementById('clk-n').classList.add('paused-clk');
+    renderClock();
+    var savedMins=fmt(_elapsedMs/60000);
+    toast('⏸ Restored paused session — '+savedMins+' min','tg');
+    gp('timer');
+  }
+}
+
+async function save(){
+  try{localStorage.setItem('rq3',JSON.stringify(S));}catch(_){}
+  syncBar('save','... Saving...');
+  try{
+    await window.storage.set('rq3_state',JSON.stringify(S));
+    syncBar('ok','☁ Saved & synced');
+  } catch(e){
+    syncBar('err','! Saved locally (cloud connection lost)');
+  }
+}
+function currentTier(){return TIERS[Math.floor(S.ri/5)];}
+function currentDivIdx(){return S.ri%5;}
+function isDiv1(){return currentDivIdx()===4;}
+function divNum(dIdx){return 5-dIdx;}
+function xpInDiv(){let b=0;for(let i=0;i<S.ri;i++)b+=TIERS[Math.floor(i/5)].xpPerDiv;return S.totalXP-b;}
+// ── Division progress: track consecutive days meeting min reading for current div ──
+function getDivProgress(){
+  if(!S.divProgress)S.divProgress={days:[],ri:S.ri};
+  // Reset if rank changed
+  if(S.divProgress.ri!==S.ri){S.divProgress={days:[],ri:S.ri};}
+  return S.divProgress;
+}
+function updateDivProgress(dateStr,minsRead){
+  var tier=currentTier();
+  var dp=getDivProgress();
+  if(minsRead<tier.divMinPerDay)return; // Didn't meet minimum
+  if(dp.days.includes(dateStr))return; // Already counted today
+  // Check consecutive: last day must be yesterday or this is first day
+  if(dp.days.length>0){
+    var lastDay=dp.days[dp.days.length-1];
+    var diff=dateDiffDays(lastDay,dateStr);
+    if(diff>1){dp.days=[dateStr];} // Streak broken, restart
+    else if(diff===1){dp.days.push(dateStr);} // Consecutive!
+    // diff===0 means same day, already handled above
+  } else {
+    dp.days.push(dateStr);
+  }
+  dp.ri=S.ri;
+  S.divProgress=dp;
+  // Check if ready to advance division
+  checkDivAdvance();
+}
+function checkDivAdvance(){
+  var tier=currentTier();
+  var dp=getDivProgress();
+  var dIdx=currentDivIdx();
+  if(dIdx>=4)return; // At div 1, need promo challenge to advance tier
+  if(dp.days.length>=tier.divDays){
+    // Advance one division!
+    S.ri++;
+    S.divProgress={days:[],ri:S.ri};
+    var newDn=divNum(S.ri%5);
+    save();renderHome();
+    toast('⬆ Division up! '+tier.name+' '+newDn,'tp');sound('rankup');spawnPt();
+    // Log reward history
+    addRewardHistory('div_up','Division Up → '+tier.name+' '+newDn,0,tier.xpPerDiv);
+    S.totalXP+=tier.xpPerDiv;
+  }
+}
+function canStartPromo(){
+  if(!isDiv1())return false;
+  if(S.promo&&S.promo.active)return false;
+  if(S.promo&&S.promo.failed){if(S.promo.failRetryAfter&&new Date()<new Date(S.promo.failRetryAfter))return false;}
+  if(Math.floor(S.ri/5)>=TIERS.length-1)return false;
+  if(S.streak<currentTier().minStreak)return false;
+  return true;
+}
+function today(){const d=new Date();const y=d.getFullYear();const m=String(d.getMonth()+1).padStart(2,'0');const day=String(d.getDate()).padStart(2,'0');return y+'-'+m+'-'+day;}
+function dateDiffDays(a,b){const[ay,am,ad]=a.split('-').map(Number);const[by,bm,bd]=b.split('-').map(Number);return Math.round((new Date(by,bm-1,bd)-new Date(ay,am-1,ad))/86400000);}
+function recalcStreak(){/* Rebuild streak from dailyMins — source of truth */const t=today();let streak=0;let cur=new Date();let d=localDateStr(cur);if(!S.dailyMins[d]){cur.setDate(cur.getDate()-1);d=localDateStr(cur);}if(S.dailyMins[d]){streak=1;const prev=new Date(cur);for(let i=1;i<365;i++){prev.setDate(prev.getDate()-1);const k=localDateStr(prev);if(S.dailyMins[k]){streak++;}else{break;}}}S.streak=streak;if(streak>( S.bestStreak||0))S.bestStreak=streak;S.lastDate=t;}
+function fmtDate(iso){if(!iso)return'';const p=iso.split('-');if(p.length<3)return iso;return p[2]+'/'+p[1];}
+function localDateStr(d){const y=d.getFullYear();const m=String(d.getMonth()+1).padStart(2,'0');const day=String(d.getDate()).padStart(2,'0');return y+'-'+m+'-'+day;}
+function fmt(m){return Math.floor(m*10)/10;}
+function checkDay(){
+  const t=today();
+  if(S.frozenStreak&&S.frozenStreak.active){
+    // Extend frozen end date each day automatically — streak protected
+    S.lastDate=t;return;
+  }
+  if(S.lastDate&&S.lastDate!==t){const diff=dateDiffDays(S.lastDate,t);if(diff>1)S.streak=0;}
+}
+// ── DAILY LOOT BOX ──────────────────────────────────────────────────────────
+function rollDailyLootBox(){
+  const r=Math.random();
+  let bonus,label,tier;
+  if(r<0.25){bonus=0;label='Kho báu trống rỗng... không có gì hôm nay';tier='nothing';}
+  else if(r<0.65){bonus=5+Math.floor(Math.random()*6);label='Loot nhỏ! +'+bonus+' phút game 🎲';tier='small';}
+  else if(r<0.90){bonus=15+Math.floor(Math.random()*11);label='Loot lớn! +'+bonus+' phút game 💥';tier='big';}
+  else{bonus=40+Math.floor(Math.random()*21);label='JACKPOT! +'+bonus+' phút game 🎰👑';tier='jackpot';}
+  return{bonus,label,tier};
+}
+function showLootBox(result){
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.88);backdrop-filter:blur(12px)';
+  const colors={nothing:'#6b7280',small:'#34d399',big:'#f0b429',jackpot:'#f97316'};
+  const icons={nothing:'📦',small:'🎁',big:'💎',jackpot:'🎰'};
+  const titles={jackpot:'JACKPOT!',big:'BIG WIN',small:'LUCKY!',nothing:'EMPTY...'};
+  const c=colors[result.tier];const ico=icons[result.tier];
+
+  const box=document.createElement('div');
+  box.style.cssText='text-align:center;animation:rupIn .5s cubic-bezier(.4,2,.5,1);padding:32px 24px;max-width:300px;background:rgba(6,4,15,0.98);border:1px solid '+c+'44;position:relative';
+
+  const icoEl=document.createElement('div');
+  icoEl.style.cssText='font-size:4.5rem;animation:ruf 1.5s ease-in-out infinite;filter:drop-shadow(0 0 28px '+c+')';
+  icoEl.textContent=ico;box.appendChild(icoEl);
+
+  const subLbl=document.createElement('div');
+  subLbl.style.cssText='font-family:monospace;font-size:.6rem;letter-spacing:.22em;color:rgba(200,146,26,0.6);margin:14px 0 4px;text-transform:uppercase';
+  subLbl.textContent='Túi Mù Hằng Ngày ✦ 30 Phút Đọc';box.appendChild(subLbl);
+
+  const titleEl=document.createElement('div');
+  titleEl.style.cssText='font-family:serif;font-size:1.2rem;font-weight:900;color:'+c+';text-shadow:0 0 24px '+c+'80;margin:8px 0;letter-spacing:.06em';
+  titleEl.textContent=titles[result.tier];box.appendChild(titleEl);
+
+  if(result.bonus>0){
+    const bonusEl=document.createElement('div');
+    bonusEl.style.cssText='font-family:serif;font-size:2.2rem;font-weight:900;color:'+c+';margin:8px 0';
+    bonusEl.textContent='+'+result.bonus;
+    const bonusSub=document.createElement('span');
+    bonusSub.style.cssText='font-size:.85rem;color:var(--muted)';
+    bonusSub.textContent=' min game';
+    bonusEl.appendChild(bonusSub);box.appendChild(bonusEl);
+  } else {
+    const emptyEl=document.createElement('div');
+    emptyEl.style.cssText='color:var(--muted);font-size:.82rem;margin:12px 0;font-style:italic;line-height:1.6';
+    emptyEl.textContent='Không có gì hôm nay... Chúc may mắn lần sau! 🍀';
+    box.appendChild(emptyEl);
+  }
+
+  const labelEl=document.createElement('div');
+  labelEl.style.cssText='color:var(--muted);font-size:.72rem;margin:8px 0 18px;line-height:1.6;font-style:italic';
+  labelEl.textContent=result.label;box.appendChild(labelEl);
+
+  const btn=document.createElement('button');
+  btn.style.cssText='padding:12px 32px;border:1px solid '+c+';background:'+c+'18;color:'+c+';cursor:pointer;font-family:serif;font-size:.72rem;font-weight:700;letter-spacing:.14em;clip-path:polygon(8px 0,calc(100% - 8px) 0,100% 50%,calc(100% - 8px) 100%,8px 100%,0 50%)';
+  btn.textContent=result.bonus>0?'⚔ COLLECT!':'OK, ngày mai thử lại';
+  btn.onclick=function(){overlay.remove();};
+  box.appendChild(btn);
+
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click',function(e){if(e.target===overlay)overlay.remove();});
+  if(result.tier==='jackpot')sound('rankup');else if(result.bonus>0)sound('reward');
+}
+
+function getGameBonus(readMins){
+  const tier=currentTier();const bonuses=[];
+  // Base conversion giảm dần theo tier: Warrior 0.80x → Legend 0.40x
+  const base=Math.floor(readMins*tier.baseConv);
+  const tierExtra=Math.floor(readMins*(tier.rewardMult-1)*tier.baseConv);
+  if(tierExtra>0)bonuses.push({label:tier.name+' bonus',val:tierExtra});
+  const prevMins=S.dailyMins[today()]||0;const newTotal=prevMins+readMins;
+  // 30 min → Loot Box (handled in commitReadSession)
+  if(newTotal>=60&&prevMins<60)bonuses.push({label:'60 min today 💪',val:30});
+  const total=base+bonuses.reduce((a,b)=>a+b.val,0);
+  return{total,bonuses,base};
+}
+function getXP(readMins){const tier=currentTier();const base=Math.floor(readMins*tier.rewardMult);const sm=S.streak>=21?1.5:S.streak>=7?1.2:1;return Math.floor(base*sm);}
+function getActiveBonuses(){
+  const tier=currentTier();const todayM=S.dailyMins[today()]||0;
+  const rows=[{icon:'⚔',desc:'Tier '+tier.name+' rate',val:'×'+tier.rewardMult,active:true}];
+  if(S.streak>=7)rows.push({icon:'⚡',desc:'Streak 7+ days',val:'XP ×1.2',active:true});
+  if(S.streak>=21)rows.push({icon:'🌟',desc:'Streak 21+ days',val:'XP ×1.5',active:true});
+  rows.push({icon:'🎲',desc:'Read 30 min → Túi Mù'+(S.lastLootBoxDate===today()?' (claimed)':''),val:S.lastLootBoxDate===today()?'✓':'?',active:S.lastLootBoxDate===today(),locked:todayM<30});
+  rows.push({icon:'💪',desc:'Read 60 min/day',val:'+30 min',active:todayM>=60,locked:todayM<60});
+  return rows;
+}
+function gp(p){
+  document.querySelectorAll('.pg').forEach(el=>el.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(el=>el.classList.remove('on'));
+  document.getElementById('pg-'+p).classList.add('on');
+  document.getElementById('nb-'+p).classList.add('on');
+  if(p==='stats')renderStats();if(p==='books'){renderBooks();}if(p==='ach')renderAch();if(p==='promo')renderPromo();if(p==='manual'){updateManualPreviews();renderFrozenControls();initMigrate();}
+}
+function renderHome(){
+  const tIdx=Math.floor(S.ri/5);const dIdx=S.ri%5;const tier=TIERS[tIdx];const dn=divNum(dIdx);
+  document.documentElement.style.setProperty('--rc',tier.color);
+  document.documentElement.style.setProperty('--tier-glow',tier.glow);
+  document.getElementById('rank-em').textContent=tier.emoji;
+  document.getElementById('rank-div').textContent=dn;
+  document.getElementById('rank-tier').textContent=tier.name+' '+dn;
+  document.getElementById('rank-flavor').textContent=tier.flavor[dIdx];
+  var dp=getDivProgress();
+  var divDaysNeeded=isDiv1()?tier.promoDays:tier.divDays;
+  var divDaysDone=isDiv1()?(S.promo&&S.promo.active?S.promo.daysOk.length:0):dp.days.length;
+  var pctDiv=Math.min(100,Math.round((divDaysDone/divDaysNeeded)*100));
+  document.getElementById('xp-fill').style.width=pctDiv+'%';
+  document.getElementById('rank-xp-txt').textContent=divDaysDone+' / '+divDaysNeeded+' days';
+  var maxRI=TIERS.length*5-1;
+  document.getElementById('rank-xp-next').textContent=isDiv1()?(S.ri<maxRI?'→ Promo Challenge':'⭐ MAX'):'→ '+tier.name+' '+(dn-1)+' ('+tier.divMinPerDay+'m/day × '+tier.divDays+' days)';
+  document.getElementById('h-book').textContent=fmt(S.totalBook);
+  document.getElementById('h-game').textContent=fmt(S.gameBudget);
+  document.getElementById('h-xp').textContent=S.totalXP;
+  document.getElementById('streak-n').textContent=S.streak;
+  document.getElementById('promo-btn').style.display=canStartPromo()&&(!S.promo||!S.promo.active)?'':'none';
+  const ms=document.getElementById('streak-ms');ms.innerHTML='';
+  STREAK_MILESTONES.slice(0,3).forEach(m=>{const el=document.createElement('div');el.className='sm-row'+(S.streak>=m.days?' hit':'');el.textContent=(S.streak>=m.days?'✅ ':'○ ')+m.label;ms.appendChild(el);});
+  renderWeek();renderHomeBonuses();
+}
+function renderWeek(){
+  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];const t=new Date();const dow=t.getDay();const mon=dow===0?-6:1-dow;
+  const el=document.getElementById('wk');el.innerHTML='';
+  for(let i=0;i<7;i++){const d=new Date(t);d.setDate(t.getDate()+mon+i);const key=localDateStr(d);const isT=key===today();const done=!!S.weekDays[key];const div=document.createElement('div');div.className='wd'+(done?' done':'')+(isT?' today':'');div.innerHTML='<span>'+days[i]+'</span><span class="wc">'+(done?'✓':isT?'·':'')+'</span>';el.appendChild(div);}
+}
+function renderHomeBonuses(){
+  const el=document.getElementById('home-bonuses');el.innerHTML='';
+  getActiveBonuses().forEach(b=>{const div=document.createElement('div');div.className='br'+(b.active?' ab':'')+(b.locked?' locked':'');div.innerHTML='<span class="bi">'+b.icon+'</span><span class="bd">'+b.desc+'</span>'+(b.val?'<span class="bv">'+b.val+'</span>':'');el.appendChild(div);});
+}
+let mode='book',running=false,paused=false,iv=null;
+// Use real timestamps — not affected by tab switching or screen lock
+let _startTs=0,_elapsedMs=0,_gameBudgetAtStart=0,_gameTotalAtStart=0;
+
+function getElapsedSecs(){
+  if(!running)return _elapsedMs/1000;
+  return (_elapsedMs+(Date.now()-_startTs))/1000;
+}
+
+function setMode(m){
+  mode=m;if(running||paused)stopTimer();paused=false;_elapsedMs=0;renderClock();
+  const bk=document.getElementById('msb-bk'),gm=document.getElementById('msb-gm'),go=document.getElementById('btn-go'),clk=document.getElementById('clk');
+  if(m==='book'){bk.className='msb bk';gm.className='msb';go.className='btn-go btn-read';go.textContent='▶ START READING';clk.className='clk bk-clk';go.disabled=false;document.getElementById('clk-hint').textContent='1 min reading = '+currentTier().baseConv+' min gaming ('+currentTier().name+')';}
+  else{bk.className='msb';gm.className='msb gm';go.className='btn-go btn-game';go.textContent='▶ START GAMING';clk.className='clk gm-clk';go.disabled=S.gameBudget<=0;document.getElementById('clk-hint').textContent='Left: '+fmt(S.gameBudget)+' min budget';}
+  renderLiveMult();renderClock();
+}
+function renderLiveMult(){
+  const el=document.getElementById('live-mult');el.innerHTML='';if(mode!=='book')return;
+  const tier=currentTier();const todayM=S.dailyMins[today()]||0;
+  [{label:'Base ×'+tier.baseConv,active:true},{label:tier.name+' bonus',active:true},{label:'🎲 Loot @30m',active:S.lastLootBoxDate===today()},{label:'+30m @60m',active:todayM>=60},{label:'Streak ×1.2',active:S.streak>=7}]
+  .forEach(c=>{const d=document.createElement('span');d.className='mult-chip'+(c.active?' active-chip':'');d.textContent=c.label;el.appendChild(d);});
+}
+function renderClock(){
+  const totalSecs=getElapsedSecs();
+  const m=Math.floor(totalSecs/60).toString().padStart(2,'0');
+  const s=Math.floor(totalSecs%60).toString().padStart(2,'0');
+  document.getElementById('clk-n').textContent=m+':'+s;
+  document.getElementById('budget-v').textContent=fmt(S.gameBudget);
+}
+function toggleTimer(){if(paused)resumeTimer();else if(!running)startTimer();}
+function startTimer(){
+  running=true;
+  _startTs=Date.now();
+  _gameBudgetAtStart=S.gameBudget;
+  _gameTotalAtStart=S.totalGame;
+  document.getElementById('btn-go').disabled=true;
+  document.getElementById('btn-pause').disabled=false;
+  document.getElementById('btn-pause').className='btn-pause';
+  document.getElementById('btn-pause').textContent='⏸';
+  document.getElementById('btn-stop').disabled=false;
+  document.getElementById('clk-n').classList.remove('paused-clk');
+  // Interval only for UI update — time calculated from real timestamp
+  iv=setInterval(function(){
+    const elapsedMins=getElapsedSecs()/60;
+    if(mode==='game'){
+      // Calculate budget from real timestamp, not per-tick accumulation
+      const spent=elapsedMins;
+      S.gameBudget=Math.max(0,_gameBudgetAtStart-spent);
+      S.totalGame=_gameTotalAtStart+spent;
+      document.getElementById('budget-v').textContent=fmt(S.gameBudget);
+      document.getElementById('clk-hint').textContent='Left: '+fmt(S.gameBudget)+' min';
+      // Auto-save every 30 real seconds
+      if(Math.floor(getElapsedSecs())%30===0&&Math.floor(getElapsedSecs())>0)save();
+      if(S.gameBudget<=0){save();stopTimer();toast('⏰ Budget used up! Time to read more.','tg');sound('end');}
+    }
+    // Auto-save reading timer state every 30s (protects against crashes/refresh)
+    if(mode==='book'&&Math.floor(getElapsedSecs())%30===0&&Math.floor(getElapsedSecs())>0){
+      S._timerState={mode:mode,elapsedMs:_elapsedMs+(Date.now()-_startTs),pausedAt:Date.now(),gameBudgetAtStart:_gameBudgetAtStart,gameTotalAtStart:_gameTotalAtStart};
+      save();
+    }
+    renderClock();
+  },500);// Update every 500ms for smooth display, time from Date.now()
+  sound('start');
+}
+function stopTimer(){
+  clearInterval(iv);running=false;
+  // Add elapsed time to _elapsedMs
+  if(_startTs>0)_elapsedMs+=Date.now()-_startTs;
+  _startTs=0;
+  document.getElementById('btn-stop').disabled=true;
+  document.getElementById('btn-pause').disabled=true;
+  document.getElementById('btn-pause').className='btn-pause';
+  document.getElementById('btn-pause').textContent='⏸';
+  document.getElementById('clk-n').classList.remove('paused-clk');
+  paused=false;
+  const mins=getElapsedSecs()/60;
+  // Clear saved timer state
+  S._timerState=null;
+  if(mode==='book'&&mins>=0.5)commitReadSession(mins);
+  else if(mode==='book')toast('Read at least 30 seconds to log!','tg');
+  else if(mode==='game'&&mins>=0.01){
+    // Final accurate update
+    S.gameBudget=Math.max(0,_gameBudgetAtStart-mins);
+    S.totalGame=_gameTotalAtStart+mins;
+    save();renderHome();
+    toast('🎮 Gamed '+fmt(mins)+' min. Remaining: '+fmt(S.gameBudget)+' min.','tgr');
+  }
+  _elapsedMs=0;setMode(mode);
+}
+function pauseTimer(){
+  if(!running||paused)return;
+  clearInterval(iv);iv=null;
+  paused=true;running=false;
+  _elapsedMs+=Date.now()-_startTs;
+  _startTs=0;
+  document.getElementById('btn-pause').className='btn-pause paused';
+  document.getElementById('btn-pause').textContent='▶';
+  document.getElementById('btn-go').disabled=false;
+  document.getElementById('btn-go').textContent='▶ RESUME';
+  document.getElementById('clk-n').classList.add('paused-clk');
+  const pausedMins=_elapsedMs/60000;
+  // Save timer state so it survives page refresh
+  S._timerState={mode:mode,elapsedMs:_elapsedMs,pausedAt:Date.now(),gameBudgetAtStart:_gameBudgetAtStart,gameTotalAtStart:_gameTotalAtStart};
+  save();
+  toast('⏸ Paused — '+(mode==='book'?'reading':'gaming')+' '+fmt(pausedMins)+' min','tg');
+}
+function resumeTimer(){
+  if(!paused)return;
+  paused=false;running=true;
+  _startTs=Date.now();
+  // Recalculate start references for game mode
+  if(mode==='game'){
+    _gameBudgetAtStart=S.gameBudget+_elapsedMs/60000;
+    _gameTotalAtStart=S.totalGame-_elapsedMs/60000;
+  }
+  document.getElementById('btn-pause').className='btn-pause';
+  document.getElementById('btn-pause').textContent='⏸';
+  document.getElementById('btn-go').disabled=true;
+  document.getElementById('clk-n').classList.remove('paused-clk');
+  if(mode==='book')document.getElementById('btn-go').textContent='▶ START READING';
+  else document.getElementById('btn-go').textContent='▶ START GAMING';
+  iv=setInterval(function(){
+    const elapsedMins=getElapsedSecs()/60;
+    if(mode==='game'){
+      S.gameBudget=Math.max(0,_gameBudgetAtStart-elapsedMins);
+      S.totalGame=_gameTotalAtStart+elapsedMins;
+      document.getElementById('budget-v').textContent=fmt(S.gameBudget);
+      document.getElementById('clk-hint').textContent='Left: '+fmt(S.gameBudget)+' min';
+      if(Math.floor(getElapsedSecs())%30===0&&Math.floor(getElapsedSecs())>0)save();
+      if(S.gameBudget<=0){save();stopTimer();toast('⏰ Budget used up! Time to read more.','tg');sound('end');}
+    }
+    renderClock();
+  },500);
+  toast('▶ Resumed!','tgr');
+}
+function commitReadSession(mins){
+  const t=today();const prevDayMins=S.dailyMins[t]||0;
+  const{total:gameEarned,bonuses}=getGameBonus(mins);const xpGained=getXP(mins);
+  S.totalBook+=mins;S.gameBudget+=gameEarned;S.totalXP+=xpGained;S.sessCount++;if(mins>S.maxSess)S.maxSess=mins;S.dailyMins[t]=prevDayMins+mins;
+  if(S.lastDate!==t){const prev=S.lastDate;if(prev){const diff=dateDiffDays(prev,t);S.streak=diff===1?S.streak+1:1;}else{S.streak=1;}S.lastDate=t;}
+  if(S.streak>S.bestStreak)S.bestStreak=S.streak;S.weekDays[t]=true;
+  const note='';
+  const ab=getActiveBook();S.sessions.unshift({date:t,mins:Math.round(mins*10)/10,note,book:(ab?ab.title:S.currentBook.title)||''});
+  // Log reward history
+  addRewardHistory('reading','Read '+fmt(mins)+' min',gameEarned,xpGained);
+  advanceDivisions();
+  // Update div progress with TOTAL today's reading (not just this session)
+  updateDivProgress(t,S.dailyMins[t]);
+  STREAK_MILESTONES.forEach(function(m){const key='sm'+m.days;if(S.streak>=m.days&&!S.claimedSM.includes(key)){S.claimedSM.push(key);S.gameBudget+=m.gameBonus;addRewardHistory('streak','Streak '+m.days+' days',m.gameBonus,0);setTimeout(function(){toast('🎉 Streak '+m.days+' days! +'+m.gameBonus+' min gaming!','tp');spawnPt();sound('rankup');},600);}});
+  updatePromoProgress(t,mins);
+  // ── Daily Loot Box: trigger once per day on first hitting 30 min ──
+  const newTotalDay=S.dailyMins[t];
+  if(newTotalDay>=30&&prevDayMins<30&&S.lastLootBoxDate!==t){
+    S.lastLootBoxDate=t;
+    const lootResult=rollDailyLootBox();
+    if(lootResult.bonus>0){S.gameBudget+=lootResult.bonus;addRewardHistory('lootbox',lootResult.label,lootResult.bonus,0);}
+    save();checkAch();renderHome();renderLiveMult();
+    const bStr=bonuses.length>0?' · '+bonuses.map(b=>b.label+' +'+fmt(b.val)+'m').join(', '):'';
+    toast('📚 +'+fmt(gameEarned)+' min gaming · +'+xpGained+' XP'+bStr,'tgr');sound('reward');
+    setTimeout(function(){showLootBox(lootResult);spawnPt();spawnPt();spawnPt();},700);
+    return;
+  }
+  save();checkAch();renderHome();renderLiveMult();
+  const bStr=bonuses.length>0?' · '+bonuses.map(b=>b.label+' +'+fmt(b.val)+'m').join(', '):'';
+  toast('📚 +'+fmt(gameEarned)+' min gaming · +'+xpGained+' XP'+bStr,'tgr');sound('reward');
+}
+function advanceDivisions(){
+  // Division advancement is now handled by updateDivProgress() based on consecutive reading days
+  // This function is kept for backward compatibility but no longer auto-advances based on XP
+}
+function updatePromoProgress(dateStr,minsRead){
+  if(!S.promo||!S.promo.active)return;
+  const tier=TIERS[S.promo.tIdx];
+  if(minsRead>=tier.minRead&&!S.promo.daysOk.includes(dateStr)){
+    const last=S.promo.daysOk.length>0?S.promo.daysOk[S.promo.daysOk.length-1]:null;
+    if(last&&Math.round((new Date(dateStr)-new Date(last))/86400000)>1){failPromo('Streak broken!');return;}
+    S.promo.daysOk.push(dateStr);if(S.promo.daysOk.length>=S.promo.daysNeeded)winPromo();
+  }
+}
+function startPromo(){
+  if(!canStartPromo())return;
+  const tIdx=Math.floor(S.ri/5);const nextTIdx=tIdx+1;if(nextTIdx>=TIERS.length)return;
+  S.promo={active:true,failed:false,tIdx,fromRI:S.ri,toRI:nextTIdx*5,daysNeeded:TIERS[tIdx].promoDays,daysOk:[],started:today(),failRetryAfter:null};
+  save();renderPromo();toast('⚔ Challenge started! Read '+TIERS[tIdx].minRead+' min/days, '+TIERS[tIdx].promoDays+' days in a row!','tp');sound('rankup');
+}
+function winPromo(){
+  const nextTIdx=Math.floor(S.promo.toRI/5);const nextTier=TIERS[nextTIdx];const reward=nextTier.rewardMult*60;
+  S.ri=S.promo.toRI;S.gameBudget+=reward;S.totalXP+=nextTier.xpPerDiv;S.promosWon++;
+  // Reset div progress for new tier
+  S.divProgress={days:[],ri:S.ri};
+  addRewardHistory('promo_win','Promoted to '+nextTier.name+' V',reward,nextTier.xpPerDiv);
+  S.promo=null;save();
+  document.documentElement.style.setProperty('--rc',nextTier.color);document.documentElement.style.setProperty('--tier-glow',nextTier.glow);
+  document.getElementById('rup-em').textContent=nextTier.emoji;document.getElementById('rup-em').style.filter='drop-shadow(0 0 30px '+nextTier.color+')';
+  document.getElementById('rup-name').textContent=nextTier.name+' V';document.getElementById('rup-name').style.color=nextTier.color;
+  document.getElementById('rup-reward').textContent='+'+Math.floor(reward)+' min gaming + '+nextTier.xpPerDiv+' XP bonus!';
+  document.getElementById('rup').style.display='flex';spawnPt();sound('rankup');checkAch();renderHome();
+}
+function failPromo(reason){
+  S.promo.active=false;S.promo.failed=true;S.promo.failRetryAfter=null;
+  save();renderPromo();renderHome();toast('❌ Challenge failed! '+(reason||'')+' Fix the issue and retry anytime!','tr');
+}
+function cancelPromo(){if(!S.promo||!S.promo.active)return;failPromo('Cancelled manually.');}
+function closeRup(){document.getElementById('rup').style.display='none';renderHome();}
+const PROMO_SLOGANS={
+  warrior:["Every page is a battle won. Keep fighting! ⚔️","Warriors are made one page at a time!","You picked up the book. That's already a win! 💪"],
+  elite:["You're no longer a beginner — you're dangerous! 🛡️","Elite readers don't quit. Neither do you!","Level up your mind, one chapter at a time!"],
+  master:["Masters aren't born — they're read into existence! 🗡️","You've come too far to stop now!","The story doesn't end here. Keep reading!"],
+  grandmaster:["Only a few reach this height. You belong here! 💜","Greatness is just the next chapter away!","Your bookshelf is your trophy case. Fill it up!"],
+  epic:["You're in rare company now. Don't stop! 💎","Epic readers read every single day. Like you!","The summit is close — keep climbing!"],
+  legend:["You were born for this rank. Claim it! 👑","Legends aren't made overnight — but you're almost there!","One last push. History remembers those who finish! 🔥"],
+  mythic:["Myths are written by those who never stop reading! 🔱","You've transcended ordinary — embrace the mythic!","The ancient scrolls whisper your name!"],
+  immortal:["Time cannot touch you. Your knowledge is eternal! ⚡","Immortals are forged in discipline and patience!","The library of eternity awaits your arrival!"],
+  transcendent:["Beyond all limits. Beyond all boundaries. You are infinite! 🌌","The universe reads through your eyes now!","You have become one with knowledge itself!"]
+};
+function renderPromo(){
+  const el=document.getElementById('promo-panel');el.innerHTML='';
+  const tIdx=Math.floor(S.ri/5);const tier=TIERS[tIdx];const nextTier=TIERS[tIdx+1];
+
+  // helper: random slogan
+  function slogan(id){const arr=PROMO_SLOGANS[id]||PROMO_SLOGANS.warrior;return arr[Math.floor(Math.random()*arr.length)];}
+
+  // MAX RANK
+  if(S.ri>=44){
+    const card=document.createElement('div');card.className='card';
+    card.innerHTML='<div style="text-align:center;padding:24px 12px">'
+      +'<div style="font-size:2.8rem;margin-bottom:8px">🌌</div>'
+      +'<div style="font-size:1rem;font-weight:900;color:#38bdf8;letter-spacing:.08em;margin-bottom:6px">TRANSCENDENT I — INFINITE</div>'
+      +'<div style="color:var(--muted);font-size:.8rem;line-height:1.7">You have reached the highest rank.<br>You are beyond all limits. Keep reading forever! 🔥</div>'
+      +'</div>';
+    el.appendChild(card);return;
+  }
+
+  // CHALLENGE IN PROGRESS
+  if(S.promo&&S.promo.active){
+    const doneCount=S.promo.daysOk.length;const needed=S.promo.daysNeeded;const tierP=TIERS[S.promo.tIdx];const nt=TIERS[S.promo.tIdx+1];
+    const todayM=S.dailyMins[today()]||0;const metToday=todayM>=tierP.minRead;
+    const card=document.createElement('div');card.className='card';
+
+    // Rank arrow header
+    card.innerHTML='<div class="ct"><span class="ct-dot" style="background:'+tierP.color+'"></span>CHALLENGE IN PROGRESS</div>'
+      +'<div class="promo-status" style="margin:12px 0 8px">'
+      +'<div class="promo-big-icon" style="filter:drop-shadow(0 0 20px '+tierP.color+')">'+tierP.emoji+'</div>'
+      +'<div class="promo-rank" style="color:'+tierP.color+'">'+tierP.name+' I</div>'
+      +'<div class="promo-arrow">↓</div>'
+      +'<div class="promo-target" style="color:'+(nt?nt.color:'#34d399')+'">'+(nt?nt.name+' V':'???')+'</div>'
+      +'</div>';
+
+    // Day progress dots
+    const daysRow=document.createElement('div');daysRow.className='promo-days-row';
+    for(let i=0;i<needed;i++){const d=document.createElement('div');d.className='pd'+(i<doneCount?' done':i===doneCount?' current':'');d.textContent=i<doneCount?'✓':(i+1);daysRow.appendChild(d);}
+    card.appendChild(daysRow);
+
+    // Today progress bar
+    const pct=Math.min(100,Math.round((todayM/tierP.minRead)*100));
+    const progressBar=document.createElement('div');
+    progressBar.style.cssText='margin:12px 0 4px;background:rgba(255,255,255,0.06);border-radius:99px;height:8px;overflow:hidden';
+    progressBar.innerHTML='<div style="height:100%;width:'+pct+'%;background:'+(metToday?'#34d399':'#60a5fa')+';border-radius:99px;transition:width .5s"></div>';
+    card.appendChild(progressBar);
+
+    const progLabel=document.createElement('div');
+    progLabel.style.cssText='font-size:.65rem;color:var(--muted);margin-bottom:10px;font-family:Share Tech Mono,monospace';
+    progLabel.innerHTML=(metToday?'✅ ':'⏳ ')+'Today: <b style="color:'+(metToday?'#34d399':'#60a5fa')+'">'+Math.round(todayM)+'</b> / '+tierP.minRead+' min &nbsp;·&nbsp; Day <b>'+(doneCount+(metToday?1:0))+'</b> of '+needed;
+    card.appendChild(progLabel);
+
+    // Slogan
+    const sq=document.createElement('div');
+    sq.style.cssText='background:rgba(7,5,16,0.85);border-left:3px solid '+tierP.color+';border-radius:0 8px 8px 0;padding:10px 12px;margin:4px 0 12px;font-size:.75rem;color:var(--text);line-height:1.5;font-style:italic';
+    sq.textContent='"'+slogan(tierP.id)+'"';
+    card.appendChild(sq);
+
+    const cb=document.createElement('button');cb.className='btn-promo btn-cancel-promo';cb.style.cssText='margin-top:4px;width:100%;opacity:.7';cb.textContent='✕ Cancel Challenge';cb.onclick=cancelPromo;
+    card.appendChild(cb);
+    el.appendChild(card);return;
+  }
+
+  // FAILED — show retry button immediately (no cooldown)
+  if(S.promo&&S.promo.failed&&!S.promo.active){
+    const card=document.createElement('div');card.className='card';
+    const streakOkRetry=S.streak>=(tier.minStreak||0);
+    card.innerHTML='<div class="ct"><span class="ct-dot" style="background:#f87171"></span>CHALLENGE FAILED</div>'
+      +'<div style="text-align:center;padding:16px 12px">'
+      +'<div style="font-size:2rem;margin-bottom:8px">😤</div>'
+      +'<div style="color:#f87171;font-size:.85rem;font-weight:700;margin-bottom:6px">Not this time — but you will!</div>'
+      +'<div style="color:var(--muted);font-size:.78rem;line-height:1.6;margin-bottom:12px">Build your streak and retry anytime when you meet the requirements. 💪</div>'
+      +'</div>';
+    const retryBtn=document.createElement('button');retryBtn.className='btn-promo btn-start-promo';retryBtn.style.cssText='width:100%;padding:14px';
+    retryBtn.innerHTML='⚔ RETRY CHALLENGE';
+    retryBtn.onclick=function(){S.promo=null;save();renderPromo();};
+    if(!streakOkRetry){retryBtn.disabled=true;retryBtn.style.opacity='.45';retryBtn.title='Need streak ≥ '+tier.minStreak+' days first';}
+    card.appendChild(retryBtn);
+    el.appendChild(card);return;
+  }
+
+  // NOT YET AT DIVISION I — show progress to unlock
+  if(!isDiv1()){
+    var dp=getDivProgress();
+    var daysNeeded=tier.divDays;
+    var daysDone=dp.days.length;
+    var pctDays=Math.min(100,Math.round((daysDone/daysNeeded)*100));
+    var todayMins=S.dailyMins[today()]||0;
+    var metToday=todayMins>=tier.divMinPerDay;
+    const card=document.createElement('div');card.className='card';
+
+    card.innerHTML='<div class="ct"><span class="ct-dot" style="background:'+tier.color+'"></span>PATH TO PROMOTION</div>';
+
+    // Current position
+    const posDiv=document.createElement('div');
+    posDiv.style.cssText='display:flex;align-items:center;gap:12px;margin:14px 0 10px;padding:12px;background:rgba(7,5,16,0.85);border-radius:2px';
+    posDiv.innerHTML='<div style="font-size:2rem">'+tier.emoji+'</div>'
+      +'<div><div style="font-size:.72rem;color:var(--muted);letter-spacing:.05em">CURRENT RANK</div>'
+      +'<div style="font-size:1rem;font-weight:900;color:'+tier.color+'">'+tier.name+' '+divNum(currentDivIdx())+'</div>'
+      +'<div style="font-size:.65rem;color:var(--muted);margin-top:2px">Read '+tier.divMinPerDay+'m/day × '+daysNeeded+' consecutive days to advance</div></div>';
+    card.appendChild(posDiv);
+
+    // Day progress bar
+    const xpWrap=document.createElement('div');
+    xpWrap.innerHTML='<div style="display:flex;justify-content:space-between;font-size:.62rem;color:var(--muted);margin-bottom:4px;font-family:Share Tech Mono,monospace">'
+      +'<span>Division Progress</span><span style="color:'+tier.color+'">'+daysDone+' / '+daysNeeded+' days</span></div>';
+    const bar=document.createElement('div');bar.style.cssText='background:rgba(255,255,255,0.06);border-radius:99px;height:10px;overflow:hidden;margin-bottom:10px';
+    bar.innerHTML='<div style="height:100%;width:'+pctDays+'%;background:linear-gradient(90deg,'+tier.color+','+tier.color+'99);border-radius:99px;transition:width .5s"></div>';
+    xpWrap.appendChild(bar);
+    card.appendChild(xpWrap);
+
+    // Today's progress
+    var todayPct=Math.min(100,Math.round((todayMins/tier.divMinPerDay)*100));
+    const todayDiv=document.createElement('div');
+    todayDiv.style.cssText='font-size:.65rem;color:var(--muted);margin-bottom:10px;font-family:Share Tech Mono,monospace';
+    todayDiv.innerHTML=(metToday?'✅ ':'⏳ ')+'Today: <b style="color:'+(metToday?'#34d399':'#60a5fa')+'">'+Math.round(todayMins)+'</b> / '+tier.divMinPerDay+' min';
+    card.appendChild(todayDiv);
+
+    // Requirements
+    const needDiv=document.createElement('div');
+    needDiv.style.cssText='background:rgba(7,5,16,0.85);border-radius:2px;padding:12px;margin-bottom:12px';
+    needDiv.innerHTML='<div style="font-size:.62rem;color:var(--muted);letter-spacing:.08em;margin-bottom:8px">📖 HOW TO ADVANCE DIVISION</div>'
+      +'<div style="display:flex;gap:8px">'
+      +'<div style="flex:1;text-align:center;background:rgba(10,7,20,0.8);border-radius:2px;padding:10px 6px">'
+      +'<div style="font-size:1.2rem;font-weight:900;color:'+tier.color+'">'+(daysNeeded-daysDone)+'</div>'
+      +'<div style="font-size:.58rem;color:var(--muted)">days left</div></div>'
+      +'<div style="flex:1;text-align:center;background:rgba(10,7,20,0.8);border-radius:2px;padding:10px 6px">'
+      +'<div style="font-size:1.2rem;font-weight:900;color:#34d399">'+tier.divMinPerDay+'m</div>'
+      +'<div style="font-size:.58rem;color:var(--muted)">min/day</div></div>'
+      +'<div style="flex:1;text-align:center;background:rgba(10,7,20,0.8);border-radius:2px;padding:10px 6px">'
+      +'<div style="font-size:1.2rem;font-weight:900;color:#fb923c">'+S.streak+'</div>'
+      +'<div style="font-size:.58rem;color:var(--muted)">streak</div></div>'
+      +'</div>';
+    card.appendChild(needDiv);
+
+    // Slogan
+    const sq=document.createElement('div');
+    sq.style.cssText='background:rgba(7,5,16,0.85);border-left:3px solid '+tier.color+';border-radius:0 8px 8px 0;padding:10px 12px;font-size:.75rem;color:var(--text);line-height:1.5;font-style:italic';
+    sq.textContent='"'+slogan(tier.id)+'"';
+    card.appendChild(sq);
+
+    el.appendChild(card);return;
+  }
+
+  // READY TO PROMOTE
+  if(!nextTier)return;
+  const streakOk=S.streak>=tier.minStreak;
+  const card=document.createElement('div');card.className='card';
+
+  // Rank arrow header
+  card.innerHTML='<div class="ct"><span class="ct-dot" style="background:'+tier.color+'"></span>PROMOTION CHALLENGE</div>'
+    +'<div class="promo-status" style="margin:14px 0 10px">'
+    +'<div class="promo-big-icon" style="filter:drop-shadow(0 0 24px '+tier.color+')">'+tier.emoji+'</div>'
+    +'<div class="promo-rank" style="color:'+tier.color+'">'+tier.name+' I</div>'
+    +'<div class="promo-arrow" style="color:'+nextTier.color+'">↓</div>'
+    +'<div class="promo-target" style="color:'+nextTier.color+'">'+nextTier.name+' V</div>'
+    +'<div style="font-size:.62rem;color:var(--muted);margin-top:4px">'+tier.promoDays+'-day challenge</div>'
+    +'</div>';
+
+  // What you need to do
+  const reqWrap=document.createElement('div');
+  reqWrap.style.cssText='background:rgba(7,5,16,0.85);border-radius:2px;padding:12px;margin-bottom:10px';
+  reqWrap.innerHTML='<div style="font-size:.62rem;color:var(--muted);letter-spacing:.08em;margin-bottom:8px">📋 CHALLENGE REQUIREMENTS</div>';
+  const reqs=[
+    {ok:streakOk, text:'Streak ≥ <b>'+tier.minStreak+' days</b> <span style="color:var(--muted)">(current: '+S.streak+')</span>'},
+    {ok:true,     text:'Read <b>'+tier.minRead+' min</b> every day'},
+    {ok:true,     text:'Complete <b>'+tier.promoDays+' consecutive days</b>'},
+    {ok:true,     text:'No days can be skipped'},
+  ];
+  reqs.forEach(function(r){
+    const d=document.createElement('div');
+    d.style.cssText='display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:.75rem';
+    d.innerHTML='<span style="font-size:.8rem">'+(r.ok?'✅':'❌')+'</span><span>'+r.text+'</span>';
+    reqWrap.appendChild(d);
+  });
+  card.appendChild(reqWrap);
+
+  // Rewards section
+  const rw=document.createElement('div');
+  rw.style.cssText='background:rgba(7,5,16,0.85);border-radius:2px;padding:12px;margin-bottom:10px';
+  rw.innerHTML='<div style="font-size:.62rem;color:var(--muted);letter-spacing:.08em;margin-bottom:8px">🏆 REWARDS ON WIN</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'
+    +'<div style="background:rgba(10,7,20,0.8);border-radius:2px;padding:9px;text-align:center">'
+    +'<div style="font-size:1rem;font-weight:900;color:#34d399">+'+Math.floor(nextTier.rewardMult*60)+'m</div>'
+    +'<div style="font-size:.58rem;color:var(--muted)">Game budget bonus</div></div>'
+    +'<div style="background:rgba(10,7,20,0.8);border-radius:2px;padding:9px;text-align:center">'
+    +'<div style="font-size:1rem;font-weight:900;color:#f0b429">+'+nextTier.xpPerDiv+' XP</div>'
+    +'<div style="font-size:.58rem;color:var(--muted)">Bonus XP</div></div>'
+    +'<div style="background:rgba(10,7,20,0.8);border-radius:2px;padding:9px;text-align:center">'
+    +'<div style="font-size:1rem;font-weight:900;color:#a78bfa">×'+nextTier.rewardMult+'</div>'
+    +'<div style="font-size:.58rem;color:var(--muted)">New reward rate</div></div>'
+    +'<div style="background:rgba(10,7,20,0.8);border-radius:2px;padding:9px;text-align:center">'
+    +'<div style="font-size:.9rem;font-weight:900;color:'+nextTier.color+'">'+nextTier.emoji+' '+nextTier.name+'</div>'
+    +'<div style="font-size:.58rem;color:var(--muted)">New rank unlocked</div></div>'
+    +'</div>';
+  card.appendChild(rw);
+
+  // Slogan
+  const sq=document.createElement('div');
+  sq.style.cssText='background:rgba(7,5,16,0.85);border-left:3px solid '+tier.color+';border-radius:0 8px 8px 0;padding:10px 12px;margin-bottom:12px;font-size:.75rem;color:var(--text);line-height:1.5;font-style:italic';
+  sq.textContent='"'+slogan(tier.id)+'"';
+  card.appendChild(sq);
+
+  // Start button
+  const sb=document.createElement('button');sb.className='btn-promo btn-start-promo';sb.style.cssText='width:100%;padding:14px';
+  sb.innerHTML='⚔ START '+tier.promoDays+'-DAY CHALLENGE';sb.onclick=startPromo;
+  if(!streakOk){sb.disabled=true;sb.style.opacity='.45';sb.title='Need streak ≥ '+tier.minStreak+' days first';}
+  card.appendChild(sb);
+  el.appendChild(card);
+}
+let _selectedDay=today();
+function renderStats(){
+  document.getElementById('s-book').textContent=fmt(S.totalBook);
+  document.getElementById('s-game').textContent=fmt(S.totalGame);
+  document.getElementById('s-xp').textContent=S.totalXP;
+  document.getElementById('s-streak').textContent=S.bestStreak;
+  document.getElementById('s-sess').textContent=S.sessCount;
+  const activeDays=Object.keys(S.dailyMins).length||1;
+  document.getElementById('s-avg').textContent=fmt(S.totalBook/activeDays);
+  const t=new Date();const vals=[];
+  for(let i=13;i>=0;i--){const d=new Date(t);d.setDate(t.getDate()-i);const key=localDateStr(d);const label=(d.getMonth()+1)+'/'+(d.getDate());vals.push({label,key,val:S.dailyMins[key]||0});}
+  // ── SVG Line Chart ──
+  const W=320, H=170, PAD_L=30, PAD_R=12, PAD_T=16, PAD_B=32;
+  const chartW=W-PAD_L-PAD_R, chartH=H-PAD_T-PAD_B;
+  const maxV=Math.max(...vals.map(function(v){return v.val;}),60);
+  const svg=document.getElementById('chart');
+  svg.innerHTML='';
+
+  function svgEl(tag,attrs){
+    var el=document.createElementNS('http://www.w3.org/2000/svg',tag);
+    Object.keys(attrs).forEach(function(k){el.setAttribute(k,attrs[k]);});
+    return el;
+  }
+  function xPos(i){return PAD_L+(i/(vals.length-1))*chartW;}
+  function yPos(v){return PAD_T+chartH-(v/maxV)*chartH;}
+
+  // ── Defs: gradients ──
+  var defs=svgEl('defs',{});
+  var grad=svgEl('linearGradient',{id:'lineGrad',x1:'0',y1:'0',x2:'0',y2:'1'});
+  grad.appendChild(svgEl('stop',{'offset':'0%','stop-color':'#60a5fa','stop-opacity':'0.25'}));
+  grad.appendChild(svgEl('stop',{'offset':'100%','stop-color':'#60a5fa','stop-opacity':'0'}));
+  defs.appendChild(grad);
+  svg.appendChild(defs);
+
+  // ── Grid lines & Y labels ──
+  [0,0.25,0.5,0.75,1].forEach(function(frac){
+    var y=PAD_T+chartH-frac*chartH;
+    var gridLine=svgEl('line',{x1:PAD_L,y1:y,x2:W-PAD_R,y2:y,stroke:'rgba(255,255,255,0.06)','stroke-width':'1','stroke-dasharray':'3,4'});
+    svg.appendChild(gridLine);
+    if(frac>0){
+      var lbl=svgEl('text',{x:PAD_L-4,y:y+3,class:'lc-grid-label'});
+      lbl.textContent=Math.round(maxV*frac)+'m';
+      svg.appendChild(lbl);
+    }
+  });
+
+  // ── Goal line at 30m ──
+  if(maxV>=30){
+    var goalY=yPos(30);
+    var goalLine=svgEl('line',{x1:PAD_L,y1:goalY,x2:W-PAD_R,y2:goalY,stroke:'#f0b429','stroke-width':'1','stroke-dasharray':'4,3','stroke-opacity':'0.45'});
+    svg.appendChild(goalLine);
+    var goalLbl=svgEl('text',{x:W-PAD_R,y:goalY-3,'text-anchor':'end','font-size':'8','fill':'#f0b429','font-family':'Share Tech Mono,monospace','opacity':'0.7'});
+    goalLbl.textContent='30m';
+    svg.appendChild(goalLbl);
+  }
+
+  // ── Area fill ──
+  var areaPoints=vals.map(function(v,i){return xPos(i)+','+yPos(v.val);}).join(' ');
+  var areaPath='M '+xPos(0)+','+yPos(vals[0].val)+' ';
+  // smooth curve using catmull-rom
+  vals.forEach(function(v,i){
+    if(i===0)return;
+    var x0=xPos(i-1),y0=yPos(vals[i-1].val);
+    var x1=xPos(i),y1=yPos(v.val);
+    var cpx=(x0+x1)/2;
+    areaPath+='C '+cpx+','+y0+' '+cpx+','+y1+' '+x1+','+y1+' ';
+  });
+  var areaClose=areaPath+' L '+xPos(vals.length-1)+','+(PAD_T+chartH)+' L '+xPos(0)+','+(PAD_T+chartH)+' Z';
+  var area=svgEl('path',{d:areaClose,fill:'url(#lineGrad)'});
+  svg.appendChild(area);
+
+  // ── Line ──
+  var linePath='M '+xPos(0)+','+yPos(vals[0].val)+' ';
+  vals.forEach(function(v,i){
+    if(i===0)return;
+    var x0=xPos(i-1),y0=yPos(vals[i-1].val);
+    var x1=xPos(i),y1=yPos(v.val);
+    var cpx=(x0+x1)/2;
+    linePath+='C '+cpx+','+y0+' '+cpx+','+y1+' '+x1+','+y1+' ';
+  });
+  var line=svgEl('path',{d:linePath,fill:'none',stroke:'#60a5fa','stroke-width':'2','stroke-linecap':'round','stroke-linejoin':'round'});
+  svg.appendChild(line);
+
+  // ── Data points + labels ──
+  vals.forEach(function(v,i){
+    var cx=xPos(i), cy=yPos(v.val);
+    var isT=v.key===today();
+    var isSel=v.key===_selectedDay;
+    var hasData=v.val>0;
+    var dotColor=isT?'#fbbf24':isSel?'#67e8f9':'#60a5fa';
+    var dotR=isT?5:isSel?5:hasData?3.5:2.5;
+
+    // dot glow for today/selected
+    if(isT||isSel){
+      var glow=svgEl('circle',{cx:cx,cy:cy,r:dotR+5,fill:dotColor,'fill-opacity':'0.15'});
+      svg.appendChild(glow);
+    }
+
+    // dot
+    var dot=svgEl('circle',{cx:cx,cy:cy,r:dotR,fill:hasData?dotColor:'#2d3748',stroke:dotColor,'stroke-width':hasData?'0':'1.5'});
+    svg.appendChild(dot);
+
+    // value label above dot (only if has data)
+    if(hasData){
+      var valLbl=svgEl('text',{x:cx,y:cy-9,'text-anchor':'middle','font-size':'8','fill':dotColor,'font-family':'Share Tech Mono,monospace','font-weight':'700'});
+      valLbl.textContent=Math.round(v.val)+'m';
+      svg.appendChild(valLbl);
+    }
+
+    // day label
+    var dayLbl=svgEl('text',{x:cx,y:H-4,class:'lc-day-label'+(isT?' today':isSel?' selected':'')});
+    dayLbl.textContent=v.label;
+    svg.appendChild(dayLbl);
+
+    // click zone (invisible rect for easier tap)
+    var hitArea=svgEl('rect',{x:cx-16,y:PAD_T,width:32,height:chartH+PAD_B,fill:'transparent',style:'cursor:pointer'});
+    hitArea.addEventListener('click',function(){
+      _selectedDay=v.key;
+      renderDayDetail();
+      renderDayPicker();
+      renderStats();
+    });
+    svg.appendChild(hitArea);
+  });
+  const bdEl=document.getElementById('week-best-day');
+  if(bdEl){const totalWeek=vals.reduce((s,v)=>s+v.val,0);const bestDay=vals.reduce((a,b)=>a.val>=b.val?a:b,vals[0]);bdEl.textContent=totalWeek>0?'14 days: '+fmt(totalWeek)+'m  |  Most read: '+bestDay.label+' ('+Math.round(bestDay.val)+'m)':'No data in last 14 days';}
+  const wGrid=document.getElementById('week-summary-grid');
+  if(wGrid){
+    const totalWeek=vals.reduce((s,v)=>s+v.val,0);
+    const daysRead=vals.filter(v=>v.val>0).length;
+    const avgDay=daysRead>0?totalWeek/daysRead:0;
+    const bestDay=vals.reduce((a,b)=>a.val>=b.val?a:b,vals[0]);
+    wGrid.innerHTML='<div class="sb2"><div class="sv2" style="color:#34d399">'+fmt(totalWeek)+'</div><div class="sl2">mins / 14 days</div></div>'
+      +'<div class="sb2"><div class="sv2" style="color:#60a5fa">'+daysRead+'</div><div class="sl2">days read</div></div>'
+      +'<div class="sb2"><div class="sv2" style="color:#f0b429">'+fmt(avgDay)+'</div><div class="sl2">avg min/read day</div></div>'
+      +'<div class="sb2"><div class="sv2" style="color:#fb923c;font-size:1rem">'+(bestDay.val>0?bestDay.label:'--')+'</div><div class="sl2">most active day</div></div>';
+  }
+  renderDayPicker();renderDayDetail();
+  const ladder=document.getElementById('rank-ladder');ladder.innerHTML='';
+  function makeTierBadgeSVG(tier,divisionIdx,unlocked,isCur){
+    const c=isCur?tier.color:(unlocked?tier.color+'bb':'#555');
+    const glow=isCur?tier.color+'88':'transparent';
+    const dn=['V','IV','III','II','I'][divisionIdx]||'';
+    const shapes={
+      warrior:'<polygon points="22,3 40,10 40,28 22,44 4,28 4,10" fill="'+c+'16" stroke="'+c+'" stroke-width="2.2" stroke-linejoin="round"/><polygon points="22,10 34,16 34,28 22,40 10,28 10,16" fill="none" stroke="'+c+'66" stroke-width="1"/><line x1="22" y1="10" x2="22" y2="38" stroke="'+c+'88" stroke-width="1.5"/><line x1="10" y1="22" x2="34" y2="22" stroke="'+c+'88" stroke-width="1.5"/><circle cx="22" cy="22" r="3" fill="'+c+'"/>',
+      elite:'<path d="M22,3 L39,10 L39,27 Q39,40 22,44 Q5,40 5,27 L5,10 Z" fill="'+c+'14" stroke="'+c+'" stroke-width="2.2"/><path d="M22,10 L32,16 L32,27 Q32,36 22,40 Q12,36 12,27 L12,16 Z" fill="none" stroke="'+c+'55" stroke-width="1"/><circle cx="22" cy="24" r="5" fill="'+c+'44" stroke="'+c+'" stroke-width="1.5"/><circle cx="22" cy="24" r="2" fill="'+c+'"/>',
+      master:'<polygon points="22,2 26,16 41,16 29,25 34,40 22,31 10,40 15,25 3,16 18,16" fill="'+c+'18" stroke="'+c+'" stroke-width="2" stroke-linejoin="round"/><polygon points="22,10 24,17 32,17 26,21 28,29 22,25 16,29 18,21 12,17 20,17" fill="'+c+'44"/>',
+      grandmaster:'<circle cx="22" cy="22" r="19" fill="'+c+'10" stroke="'+c+'" stroke-width="2.5"/><circle cx="22" cy="22" r="13" fill="none" stroke="'+c+'" stroke-width="1.5" stroke-dasharray="3,2"/><circle cx="22" cy="22" r="7" fill="'+c+'30" stroke="'+c+'" stroke-width="1.5"/><circle cx="22" cy="22" r="3" fill="'+c+'"/><circle cx="22" cy="3" r="2" fill="'+c+'"/><circle cx="22" cy="41" r="2" fill="'+c+'"/><circle cx="3" cy="22" r="2" fill="'+c+'"/><circle cx="41" cy="22" r="2" fill="'+c+'"/>',
+      epic:'<polygon points="22,2 42,13 42,35 22,46 2,35 2,13" fill="'+c+'10" stroke="'+c+'" stroke-width="2.5"/><polygon points="22,9 36,17 36,33 22,41 8,33 8,17" fill="none" stroke="'+c+'" stroke-width="1.2" stroke-dasharray="2,2"/><polygon points="22,15 30,20 30,29 22,34 14,29 14,20" fill="'+c+'30" stroke="'+c+'" stroke-width="1.5"/><circle cx="22" cy="24" r="3" fill="'+c+'"/>',
+      legend:'<path d="M4,33 L10,13 L18,25 L22,6 L26,25 L34,13 L40,33 Z" fill="'+c+'18" stroke="'+c+'" stroke-width="2.2" stroke-linejoin="round"/><rect x="4" y="33" width="36" height="6" rx="1.5" fill="'+c+'" opacity=".75"/><circle cx="10" cy="13" r="2.5" fill="'+c+'"/><circle cx="22" cy="6" r="3" fill="'+c+'"/><circle cx="34" cy="13" r="2.5" fill="'+c+'"/><circle cx="22" cy="18" r="5" fill="'+c+'44" stroke="'+c+'" stroke-width="1"/>',
+      mythic:'<path d="M22,2 L28,14 L42,14 L30,22 L34,36 L22,28 L10,36 L14,22 L2,14 L16,14 Z" fill="'+c+'14" stroke="'+c+'" stroke-width="2"/><circle cx="22" cy="20" r="6" fill="'+c+'33" stroke="'+c+'" stroke-width="1.5"/><line x1="22" y1="2" x2="22" y2="14" stroke="'+c+'" stroke-width="1.5"/><circle cx="22" cy="20" r="2.5" fill="'+c+'"/>',
+      immortal:'<polygon points="22,2 38,8 42,24 34,38 10,38 2,24 6,8" fill="'+c+'12" stroke="'+c+'" stroke-width="2.5"/><polygon points="22,10 32,14 35,24 30,32 14,32 9,24 12,14" fill="none" stroke="'+c+'" stroke-width="1" stroke-dasharray="2,2"/><path d="M16,22 L22,12 L28,22 L22,18 Z" fill="'+c+'55" stroke="'+c+'" stroke-width="1.2"/><circle cx="22" cy="26" r="3" fill="'+c+'"/>',
+      transcendent:'<circle cx="22" cy="22" r="20" fill="'+c+'08" stroke="'+c+'" stroke-width="2"/><circle cx="22" cy="22" r="15" fill="none" stroke="'+c+'" stroke-width="1" stroke-dasharray="4,2"/><circle cx="22" cy="22" r="10" fill="'+c+'15" stroke="'+c+'" stroke-width="1.5"/><circle cx="22" cy="22" r="5" fill="'+c+'35" stroke="'+c+'" stroke-width="1"/><circle cx="22" cy="22" r="2" fill="'+c+'"/><circle cx="22" cy="2" r="1.5" fill="'+c+'"/><circle cx="42" cy="22" r="1.5" fill="'+c+'"/><circle cx="22" cy="42" r="1.5" fill="'+c+'"/><circle cx="2" cy="22" r="1.5" fill="'+c+'"/>'
+    };
+    const shape=shapes[tier.id]||shapes.warrior;
+    return '<svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" width="44" height="44" style="flex-shrink:0;filter:'+(isCur?'drop-shadow(0 0 7px '+glow+')':'')+((!unlocked&&!isCur)?';opacity:.3':'')+'">'+shape+'</svg>';
+  }
+  TIERS.forEach(function(tier,tIdx){
+    const td=document.createElement('div');td.className='rl-tier';
+    const hdr=document.createElement('div');hdr.className='rl-tier-hdr';hdr.style.color=tier.color;hdr.style.borderBottomColor=tier.color+'44';
+    hdr.innerHTML='<svg viewBox="0 0 44 44" width="22" height="22" style="opacity:.9">'+({warrior:'<polygon points="22,3 40,10 40,28 22,44 4,28 4,10" fill="none" stroke="'+tier.color+'" stroke-width="3"/>',elite:'<path d="M22,3 L39,10 L39,27 Q39,40 22,44 Q5,40 5,27 L5,10 Z" fill="none" stroke="'+tier.color+'" stroke-width="3"/>',master:'<polygon points="22,2 26,16 41,16 29,25 34,40 22,31 10,40 15,25 3,16 18,16" fill="none" stroke="'+tier.color+'" stroke-width="2.5"/>',grandmaster:'<circle cx="22" cy="22" r="19" fill="none" stroke="'+tier.color+'" stroke-width="3"/><circle cx="22" cy="22" r="11" fill="none" stroke="'+tier.color+'" stroke-width="1.5" stroke-dasharray="3,2"/>',epic:'<polygon points="22,2 42,13 42,35 22,46 2,35 2,13" fill="none" stroke="'+tier.color+'" stroke-width="3"/>',legend:'<path d="M4,33 L10,13 L18,25 L22,6 L26,25 L34,13 L40,33 Z" fill="none" stroke="'+tier.color+'" stroke-width="2.5"/><rect x="4" y="33" width="36" height="6" fill="'+tier.color+'" opacity=".8"/>',mythic:'<path d="M22,2 L28,14 L42,14 L30,22 L34,36 L22,28 L10,36 L14,22 L2,14 L16,14 Z" fill="none" stroke="'+tier.color+'" stroke-width="2.5"/>',immortal:'<polygon points="22,2 38,8 42,24 34,38 10,38 2,24 6,8" fill="none" stroke="'+tier.color+'" stroke-width="3"/>',transcendent:'<circle cx="22" cy="22" r="20" fill="none" stroke="'+tier.color+'" stroke-width="2.5"/><circle cx="22" cy="22" r="10" fill="none" stroke="'+tier.color+'" stroke-width="1.5"/>'})[tier.id]+'</svg><span>'+tier.name+'</span>';
+    td.appendChild(hdr);
+    const divNums=['V','IV','III','II','I'];
+    for(let dIdx=0;dIdx<5;dIdx++){
+      const ri2=tIdx*5+dIdx;const isCur=ri2===S.ri;const unlocked=S.ri>ri2;
+      const item=document.createElement('div');item.className='rl-item'+(isCur?' cur':'')+(unlocked?' unlocked':' locked');
+      if(isCur)item.style.borderColor=tier.color;
+      const badge=makeTierBadgeSVG(tier,dIdx,unlocked,isCur);
+      item.insertAdjacentHTML('beforeend', badge);
+      const infoDiv=document.createElement('div');
+      infoDiv.style.cssText='flex:1;min-width:0';
+      const nameDiv=document.createElement('div');
+      nameDiv.style.cssText='font-family:Cinzel,serif;font-weight:700;font-size:.82rem;color:'+(unlocked||isCur?tier.color:'#555');
+      nameDiv.textContent=tier.name+' '+divNums[dIdx];
+      const flavDiv=document.createElement('div');
+      flavDiv.style.cssText='font-family:monospace;font-size:.58rem;color:var(--muted);margin-top:2px;letter-spacing:.04em';
+      flavDiv.textContent=tier.flavor[4-dIdx];
+      infoDiv.appendChild(nameDiv);infoDiv.appendChild(flavDiv);item.appendChild(infoDiv);
+      if(isCur){const youTag=document.createElement('div');youTag.style.cssText='font-family:monospace;font-size:.6rem;font-weight:700;padding:4px 10px;border:1px solid '+tier.color+'66;background:'+tier.color+'14;color:'+tier.color+';letter-spacing:.1em;animation:hex-pulse 2s ease-in-out infinite';youTag.textContent='YOU';item.appendChild(youTag);}
+      if(unlocked&&!isCur){const doneTag=document.createElement('div');doneTag.style.cssText='font-size:1rem;color:'+tier.color+'88';doneTag.textContent='✓';item.appendChild(doneTag);}
+      td.appendChild(item);
+    }
+    ladder.appendChild(td);
+  });
+  renderRewardHistory();
+}
+// ═══ RENDER REWARD HISTORY ═══
+function renderRewardHistory(){
+  var el=document.getElementById('reward-history-list');if(!el)return;
+  if(!S.rewardHistory||!S.rewardHistory.length){
+    el.innerHTML='<div style="font-size:.78rem;color:var(--muted);text-align:center;padding:16px 0">No rewards yet. Start reading to earn rewards!</div>';
+    return;
+  }
+  var typeIcons={reading:'📚',achievement:'🏆',streak:'🔥',lootbox:'🎲',promo_win:'⚔',div_up:'⬆',review:'📝',manual:'📜',note:'✏'};
+  var typeColors={reading:'#60a5fa',achievement:'#a78bfa',streak:'#fb923c',lootbox:'#f0b429',promo_win:'#34d399',div_up:'#c084fc',review:'#86efac',manual:'#67e8f9',note:'#c4b5fd'};
+  var html='';
+  S.rewardHistory.slice(0,100).forEach(function(r){
+    var icon=typeIcons[r.type]||'🎁';
+    var color=typeColors[r.type]||'var(--gold)';
+    var rewards=[];
+    if(r.game)rewards.push('<span style="color:#34d399">🎮 +'+fmt(r.game)+'m</span>');
+    if(r.xp)rewards.push('<span style="color:#f0b429">⚡ +'+r.xp+' XP</span>');
+    html+='<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid rgba(200,146,26,0.06)">'
+      +'<span style="font-size:1rem;flex-shrink:0">'+icon+'</span>'
+      +'<div style="flex:1;min-width:0">'
+      +'<div style="font-size:.75rem;color:'+color+';font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+r.desc+'</div>'
+      +'<div style="font-size:.58rem;color:var(--muted);margin-top:2px;font-family:Share Tech Mono,monospace">'+fmtDate(r.date)+(rewards.length?' · '+rewards.join(' · '):'')+'</div>'
+      +'</div></div>';
+  });
+  el.innerHTML=html;
+}
+function renderDayPicker(){
+  const el=document.getElementById('day-picker');if(!el)return;
+  const allDates=Object.keys(S.dailyMins).sort().reverse().slice(0,14);
+  if(allDates.length&&!allDates.includes(_selectedDay))_selectedDay=allDates[0];
+  el.innerHTML='';
+  if(!allDates.length){el.innerHTML='<span style="font-size:.75rem;color:var(--muted)">No data</span>';return;}
+  allDates.forEach(function(d){
+    const btn=document.createElement('button');
+    btn.className='day-chip'+(d===_selectedDay?' active-day':'');
+    const wd=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const dt=new Date(d+'T12:00:00');
+    btn.textContent=wd[dt.getDay()]+' '+d.slice(5);
+    btn.onclick=function(){_selectedDay=d;renderDayDetail();renderDayPicker();};
+    el.appendChild(btn);
+  });
+}
+function renderDayDetail(){
+  const el=document.getElementById('day-detail');if(!el)return;
+  const d=_selectedDay;
+  const dayMins=S.dailyMins[d]||0;
+  const daySessions=S.sessions.filter(s=>s.date===d);
+  if(!dayMins&&!daySessions.length){el.innerHTML='<div style="font-size:.75rem;color:var(--muted);padding:8px">No data for this day.</div>';return;}
+  let html='';
+  html+='<div class="day-stat-row"><span>Total reading</span><span class="day-stat-val" style="color:#60a5fa">'+fmt(dayMins)+'m</span></div>';
+  html+='<div class="day-stat-row"><span>Sessions</span><span class="day-stat-val" style="color:#34d399">'+daySessions.length+' lan</span></div>';
+  if(daySessions.length>0){
+    const avgSess=dayMins/daySessions.length;
+    html+='<div class="day-stat-row"><span>Avg per session</span><span class="day-stat-val" style="color:#f0b429">'+fmt(avgSess)+'m</span></div>';
+    const maxSess=Math.max(...daySessions.map(s=>parseFloat(s.mins)||0));
+    html+='<div class="day-stat-row"><span>Longest session</span><span class="day-stat-val" style="color:#a78bfa">'+fmt(maxSess)+'m</span></div>';
+    const booksToday=[...new Set(daySessions.filter(s=>s.book).map(s=>s.book))];
+    if(booksToday.length)html+='<div class="day-stat-row"><span>Books read</span><span style="font-size:.72rem;color:#818cf8;text-align:right;max-width:180px">'+booksToday.join(', ')+'</span></div>';
+    html+='<div style="margin-top:10px;font-size:.68rem;color:var(--muted);font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding-bottom:4px">SESSION DETAILS</div>';
+    daySessions.forEach(function(s){
+      html+='<div style="display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--border)">'
+        +'<span style="color:#60a5fa;font-family:\'Cinzel\',serif;font-size:.78rem;font-weight:700;flex-shrink:0;min-width:36px">'+fmt(s.mins)+'m</span>'
+        +(s.book?'<span style="color:#818cf8;font-size:.7rem;flex-shrink:0;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">['+s.book+']</span>':'')
+        +'<span style="color:var(--muted);font-size:.72rem;flex:1;line-height:1.4">'+(s.note&&s.note!='--'?s.note:'')+'</span>'
+        +'</div>';
+    });
+  }
+  el.innerHTML=html;
+}
+function getActiveBook(){
+  if(!S.books)S.books=[];
+  if(S.activeBookId){var f=S.books.find(function(b){return b.id===S.activeBookId;});return f||null;}
+  return null;
+}
+function openAddBook(editId){
+  var card=document.getElementById('book-form-card');
+  document.getElementById('book-form-title').textContent=editId?'EDIT BOOK':'ADD NEW BOOK';
+  if(editId){
+    var bk=S.books.find(function(b){return b.id===editId;});
+    if(bk){document.getElementById('bk-ti').value=bk.title;document.getElementById('bk-au').value=bk.author||'';document.getElementById('bk-pg').value=bk.page||'';document.getElementById('bk-tot').value=bk.total||'';document.getElementById('bk-cat').value=bk.category||'';}
+    card.dataset.editId=editId;
+  } else {
+    ['bk-ti','bk-au','bk-pg','bk-tot'].forEach(function(id){document.getElementById(id).value='';});
+    document.getElementById('bk-cat').value='';
+    delete card.dataset.editId;
+  }
+  card.style.display='';card.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function closeBookForm(){document.getElementById('book-form-card').style.display='none';}
+function saveBook(){
+  var title=document.getElementById('bk-ti').value.trim();
+  var author=document.getElementById('bk-au').value.trim();
+  var page=parseInt(document.getElementById('bk-pg').value)||0;
+  var total=parseInt(document.getElementById('bk-tot').value)||0;
+  var category=document.getElementById('bk-cat').value||'';
+  if(!title){toast('Please enter a title!','tg');return;}
+  if(!S.books)S.books=[];
+  var card=document.getElementById('book-form-card');
+  var editId=card.dataset.editId;
+  if(editId){
+    var bk=S.books.find(function(b){return b.id===editId;});
+    if(bk){bk.title=title;bk.author=author;bk.page=page;bk.total=total;bk.category=category;}
+    delete card.dataset.editId;
+  } else {
+    var id='bk_'+Date.now();
+    S.books.push({id:id,title:title,author:author,page:page,total:total,category:category,done:false,added:today()});
+    if(!S.activeBookId)S.activeBookId=id;
+  }
+  var ab=getActiveBook();if(ab)S.currentBook={title:ab.title,author:ab.author,page:ab.page,total:ab.total};
+  closeBookForm();save();renderBooks();toast('Saved: '+title,'tgr');
+}
+function setActiveBook(id){
+  S.activeBookId=id;
+  var ab=getActiveBook();
+  if(ab)S.currentBook={title:ab.title,author:ab.author,page:ab.page,total:ab.total};
+  save();renderBooks();toast('Now reading: '+(ab?ab.title:''),'tgr');
+}
+function finishBook(id){
+  if(!S.books)S.books=[];
+  var bkId=id||S.activeBookId;
+  var bk=S.books.find(function(b){return b.id===bkId;});
+  if(!bk){toast('No books yet!','tg');return;}
+  bk.done=true;bk.finishedDate=today();S.booksFinished++;
+  if(S.activeBookId===bkId){
+    var nextActive=S.books.find(function(b){return !b.done&&b.id!==bkId;});
+    S.activeBookId=nextActive?nextActive.id:null;
+    var ab2=getActiveBook();
+    S.currentBook=ab2?{title:ab2.title,author:ab2.author,page:ab2.page,total:ab2.total}:{title:'',author:'',page:0,total:0};
+  }
+  save();checkAch();renderBooks();toast('Finished "'+bk.title+'"! Excellent!','tp');spawnPt();sound('rankup');
+}
+function deleteBook(id){
+  if(!confirm('Delete this book?'))return;
+  S.books=S.books.filter(function(b){return b.id!==id;});
+  if(S.activeBookId===id){var next=S.books.find(function(b){return !b.done;});S.activeBookId=next?next.id:null;}
+  save();renderBooks();toast('Deleted!','tg');
+}
+var _bookCatFilter='all';
+var CAT_LABELS={fiction:'📖 Fiction',nonfiction:'📚 Non-Fiction',foreign:'🌐 Ngoại ngữ',selfhelp:'💡 Self-Help',business:'💼 Business',technical:'⚙️ Technical',other:'📝 Other','':'📦 No Cat'};
+function renderBooks(){
+  if(!S.books)S.books=[];
+  var lib=document.getElementById('book-library');
+  if(!lib)return;
+  // Category filter tabs
+  var cats=['all'];
+  S.books.forEach(function(b){var c=b.category||'';if(cats.indexOf(c)===-1)cats.push(c);});
+  var filterHtml='<div style="display:flex;gap:4px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px">';
+  filterHtml+='<button class="day-chip'+(_bookCatFilter==='all'?' active-day':'')+'" onclick="_bookCatFilter=\'all\';renderBooks()">All ('+S.books.length+')</button>';
+  cats.forEach(function(c){
+    if(c==='all')return;
+    var cnt=S.books.filter(function(b){return (b.category||'')=== c;}).length;
+    if(cnt===0)return;
+    filterHtml+='<button class="day-chip'+(_bookCatFilter===c?' active-day':'')+'" onclick="_bookCatFilter=\''+c+'\';renderBooks()">'+(CAT_LABELS[c]||c)+' ('+cnt+')</button>';
+  });
+  filterHtml+='</div>';
+  var filteredBooks=_bookCatFilter==='all'?S.books:S.books.filter(function(b){return (b.category||'')===_bookCatFilter;});
+  var reading=filteredBooks.filter(function(b){return !b.done;});
+  var done=filteredBooks.filter(function(b){return b.done;});
+  var colors=['#3b82f6','#8b5cf6','#f0b429','#34d399','#f97316'];
+  lib.innerHTML=filterHtml;
+  if(!filteredBooks.length){
+    lib.innerHTML+=('<div style="font-size:.78rem;color:var(--muted);padding:10px 0;text-align:center">'+(S.books.length?'No books in this category.':'No books yet. Add one to get started!')+'</div>');
+    return;
+  }
+  function makeBookEl(bk, isDone){
+    var isActive=bk.id===S.activeBookId;
+    var pct=bk.total>0?Math.round((bk.page/bk.total)*100):0;
+    var ci=S.books.indexOf(bk)%colors.length;
+    var c=colors[ci];
+    var el=document.createElement('div');
+    el.className='bk-item'+(isActive?' active-bk':'')+(isDone?' done-bk':'');
+    // Spine
+    var spine=document.createElement('div');
+    spine.className='bk-spine2';
+    spine.style.background=isDone?'rgba(52,211,153,0.08)':'linear-gradient(135deg,'+c+'22,'+c+'44)';
+    spine.textContent=isDone?'✅':(isActive?'📖':'📘');
+    el.appendChild(spine);
+    // Info
+    var info=document.createElement('div');
+    info.className='bk-info';
+    if(!isDone){info.style.cursor='pointer';info.onclick=function(){setActiveBook(bk.id);};}
+    var titleEl=document.createElement('div');
+    titleEl.className='bk-title';
+    titleEl.style.color=isDone?'#34d399':(isActive?c:'var(--text)');
+    titleEl.textContent=bk.title+(isActive?' [READING]':'');
+    info.appendChild(titleEl);
+    if(bk.author){var au=document.createElement('div');au.className='bk-author';au.textContent=bk.author+(bk.category?' · '+(CAT_LABELS[bk.category]||bk.category):'');info.appendChild(au);}
+    else if(bk.category){var catEl=document.createElement('div');catEl.className='bk-author';catEl.textContent=CAT_LABELS[bk.category]||bk.category;info.appendChild(catEl);}
+    var prog=document.createElement('div');
+    prog.className='bk-prog';
+    prog.style.color=isDone?'#34d399':'#60a5fa';
+    prog.textContent=isDone?'Finished'+(bk.finishedDate?' · '+bk.finishedDate:''):(bk.total>0?'Page '+bk.page+'/'+bk.total+' · '+pct+'%':'Page not set');
+    info.appendChild(prog);
+    if(!isDone&&bk.total>0){
+      var pbar=document.createElement('div');pbar.style.cssText='height:2px;background:rgba(255,255,255,0.05);border-radius:1px;margin-top:4px;overflow:hidden';
+      var pfill=document.createElement('div');pfill.style.cssText='height:100%;width:'+pct+'%;background:'+c+';border-radius:1px;transition:width .5s';
+      pbar.appendChild(pfill);info.appendChild(pbar);
+    }
+    el.appendChild(info);
+    // Actions
+    var actions=document.createElement('div');actions.className='bk-actions';
+    if(!isDone){
+      var editBtn=document.createElement('button');editBtn.className='bk-act-btn';editBtn.title='Sua';editBtn.textContent='✏';
+      editBtn.onclick=function(e){e.stopPropagation();openAddBook(bk.id);};
+      var doneBtn=document.createElement('button');doneBtn.className='bk-act-btn';doneBtn.title='Finished';doneBtn.textContent='✓';
+      doneBtn.style.cssText='color:#34d399;border-color:rgba(52,211,153,0.3)';
+      doneBtn.onclick=function(e){e.stopPropagation();finishBook(bk.id);};
+      actions.appendChild(editBtn);actions.appendChild(doneBtn);
+    }
+    var delBtn=document.createElement('button');delBtn.className='bk-act-btn';delBtn.title='Xoa';delBtn.textContent='✕';
+    delBtn.style.cssText='color:#f87171;border-color:rgba(248,113,113,0.3)';
+    delBtn.onclick=function(e){e.stopPropagation();deleteBook(bk.id);};
+    actions.appendChild(delBtn);
+    el.appendChild(actions);
+    return el;
+  }
+  if(reading.length){
+    var rHdr=document.createElement('div');
+    rHdr.style.cssText='font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;margin-top:4px';
+    rHdr.textContent='Reading ('+reading.length+')';lib.appendChild(rHdr);
+    reading.forEach(function(bk){lib.appendChild(makeBookEl(bk,false));});
+  }
+  if(done.length){
+    var dHdr=document.createElement('div');
+    dHdr.style.cssText='font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;margin-top:12px';
+    dHdr.textContent='Finished ('+done.length+')';lib.appendChild(dHdr);
+    done.slice(0,5).forEach(function(bk){lib.appendChild(makeBookEl(bk,true));});
+  }
+  // Session list
+  var sl=document.getElementById('sess-list');if(!sl)return;sl.innerHTML='';
+  if(!S.sessions.length){sl.innerHTML='<div style="font-size:.75rem;color:var(--muted);padding:8px">No sessions yet.</div>';return;}
+  S.sessions.slice(0,40).forEach(function(s){
+    var item=document.createElement('div');item.className='si';
+    item.innerHTML='<span class="si-d">'+fmtDate(s.date)+'</span>'
+      +(s.book?'<span style="font-size:.65rem;color:#818cf8;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+s.book+'</span>':'')
+      +'<span class="si-n">'+(s.note||'--')+'</span>'
+      +'<span class="si-m" style="font-family:Cinzel,serif">'+s.mins+'m</span>';
+    sl.appendChild(item);
+  });
+}
+// ═══ BOOK NOTES SYSTEM ═══
+var _activeNoteBookId=null;
+var _editingNoteIdx=-1;
+
+function initBookNotes(){
+  if(!S.bookNotes)S.bookNotes={};// {bookId: [{text,date,words,id},...]}
+}
+
+function getBookNoteStats(bookId){
+  initBookNotes();
+  var notes=S.bookNotes[bookId]||[];
+  var totalWords=0;
+  notes.forEach(function(n){totalWords+=(n.words||0);});
+  return {count:notes.length,totalWords:totalWords};
+}
+
+function getAllNoteStats(){
+  initBookNotes();
+  var totalNotes=0,totalWords=0,longestNote=0;
+  Object.keys(S.bookNotes).forEach(function(bid){
+    var notes=S.bookNotes[bid]||[];
+    totalNotes+=notes.length;
+    notes.forEach(function(n){
+      totalWords+=(n.words||0);
+      var len=(n.text||'').length;
+      if(len>longestNote)longestNote=len;
+    });
+  });
+  // Also count old notedSess
+  totalNotes+=(S.notedSess||0);
+  totalWords+=(S.totalNoteWords||0);
+  longestNote=Math.max(longestNote,(S.longestNote||0));
+  return {totalNotes:totalNotes,totalWords:totalWords,longestNote:longestNote};
+}
+
+function renderBookNoteTabs(){
+  var el=document.getElementById('book-notes-tabs');if(!el)return;
+  if(!S.books||!S.books.length){el.innerHTML='';return;}
+  initBookNotes();
+  var allBooks=S.books.filter(function(b){return !b.done;}).concat(S.books.filter(function(b){return b.done;}));
+  if(!_activeNoteBookId&&allBooks.length)_activeNoteBookId=S.activeBookId||allBooks[0].id;
+  el.innerHTML=allBooks.map(function(bk){
+    var stats=getBookNoteStats(bk.id);
+    var isActive=bk.id===_activeNoteBookId;
+    return '<button class="bn-tab'+(isActive?' active':'')+'" onclick="selectNoteBook(\''+bk.id+'\')">'
+      +(bk.done?'✅ ':bk.id===S.activeBookId?'📖 ':'📘 ')
+      +bk.title
+      +'<span class="bn-count">('+stats.count+')</span></button>';
+  }).join('');
+}
+
+function selectNoteBook(bookId){
+  _activeNoteBookId=bookId;
+  _editingNoteIdx=-1;
+  renderBookNotes();
+  renderBookNoteTabs();
+}
+
+function renderBookNotes(){
+  var area=document.getElementById('book-notes-area');if(!area)return;
+  initBookNotes();
+  if(!_activeNoteBookId){
+    area.innerHTML='<div style="font-size:.82rem;color:var(--muted);text-align:center;padding:16px 0">Add a book first to start taking notes</div>';
+    return;
+  }
+  var bk=S.books?S.books.find(function(b){return b.id===_activeNoteBookId;}):null;
+  if(!bk){area.innerHTML='';return;}
+  var notes=S.bookNotes[_activeNoteBookId]||[];
+  var stats=getBookNoteStats(_activeNoteBookId);
+  var html='';
+  // Stats bar
+  html+='<div class="bn-stats">'
+    +'<div class="bn-stat"><div class="bn-stat-val">'+stats.count+'</div><div class="bn-stat-lbl">Notes</div></div>'
+    +'<div class="bn-stat"><div class="bn-stat-val">'+stats.totalWords+'</div><div class="bn-stat-lbl">Words</div></div>'
+    +'</div>';
+  // Input area
+  html+='<div class="bn-input-row">'
+    +'<textarea class="bn-input" id="bn-input-text" placeholder="Write a note about '+bk.title+'..."></textarea>'
+    +'</div>'
+    +'<div style="display:flex;gap:6px;margin-bottom:14px">'
+    +'<button class="bn-add-btn" style="flex:1" onclick="addBookNote()" id="bn-submit-btn">📝 Add Note</button>'
+    +'</div>';
+  // Notes list
+  if(notes.length){
+    html+='<div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Notes ('+notes.length+')</div>';
+    notes.forEach(function(n,i){
+      html+='<div class="bn-note-item">'
+        +'<div class="bn-note-text">'+escHtml(n.text)+'</div>'
+        +'<div class="bn-note-meta">'
+        +'<span>'+fmtDate(n.date)+(n.words?' · '+n.words+' words':'')+'</span>'
+        +'<div class="bn-note-actions">'
+        +'<button class="bn-note-btn" onclick="editBookNote('+i+')">✏ Edit</button>'
+        +'<button class="bn-note-btn del" onclick="deleteBookNote('+i+')">✕</button>'
+        +'</div></div></div>';
+    });
+  } else {
+    html+='<div style="text-align:center;padding:16px 0;font-size:.82rem;color:var(--muted)">No notes yet for this book. Start writing!</div>';
+  }
+  area.innerHTML=html;
+  // If editing, prefill
+  if(_editingNoteIdx>=0&&notes[_editingNoteIdx]){
+    document.getElementById('bn-input-text').value=notes[_editingNoteIdx].text;
+    document.getElementById('bn-submit-btn').textContent='💾 Save Edit';
+  }
+}
+
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
+
+function addBookNote(){
+  initBookNotes();
+  var text=document.getElementById('bn-input-text').value.trim();
+  if(!text){toast('Write something first!','tg');return;}
+  var wordCount=text.split(/\s+/).filter(function(w){return w.length>0;}).length;
+  if(!S.bookNotes[_activeNoteBookId])S.bookNotes[_activeNoteBookId]=[];
+  if(_editingNoteIdx>=0&&S.bookNotes[_activeNoteBookId][_editingNoteIdx]){
+    // Edit existing
+    var old=S.bookNotes[_activeNoteBookId][_editingNoteIdx];
+    old.text=text;old.words=wordCount;old.date=today();
+    _editingNoteIdx=-1;
+    toast('✏ Note updated!','tgr');
+  } else {
+    // Add new
+    S.bookNotes[_activeNoteBookId].unshift({text:text,date:today(),words:wordCount,id:'n'+Date.now()});
+    // Update legacy note stats for achievements
+    S.notedSess=(S.notedSess||0)+1;
+    S.totalNoteWords=(S.totalNoteWords||0)+wordCount;
+    if(text.length>(S.longestNote||0))S.longestNote=text.length;
+    // Note streak
+    if(S.lastNotedDate){
+      var diff=Math.round((new Date(today())-new Date(S.lastNotedDate))/86400000);
+      if(diff===1)S.noteStreak=(S.noteStreak||0)+1;
+      else if(diff>1)S.noteStreak=1;
+    } else {S.noteStreak=1;}
+    S.lastNotedDate=today();
+    if((S.noteStreak||0)>(S.bestNoteStreak||0))S.bestNoteStreak=S.noteStreak;
+    toast('📝 Note added! +5 XP','tgr');
+    S.totalXP+=5;
+  }
+  save();checkAch();renderBookNotes();renderBookNoteTabs();
+}
+
+function editBookNote(idx){
+  _editingNoteIdx=idx;
+  renderBookNotes();
+  var el=document.getElementById('bn-input-text');
+  if(el)el.focus();
+}
+
+function deleteBookNote(idx){
+  initBookNotes();
+  if(!confirm('Delete this note?'))return;
+  var notes=S.bookNotes[_activeNoteBookId];
+  if(notes&&notes[idx]){notes.splice(idx,1);}
+  if(_editingNoteIdx===idx)_editingNoteIdx=-1;
+  save();renderBookNotes();renderBookNoteTabs();
+  toast('Note deleted','tg');
+}
+
+// Patch renderBooks to also render notes
+var _origRenderBooks=renderBooks;
+renderBooks=function(){
+  _origRenderBooks();
+  renderBookNoteTabs();
+  renderBookNotes();
+};
+
+function checkAch(){
+  let nu=[];
+  ACHIEVEMENTS.forEach(function(a){
+    if(!S.achievements[a.id]&&a.check(S)){
+      S.achievements[a.id]={date:today()};
+      // Grant rewards
+      if(a.reward){
+        if(a.reward.game){S.gameBudget+=a.reward.game;}
+        if(a.reward.xp){S.totalXP+=a.reward.xp;}
+        addRewardHistory('achievement',a.name,(a.reward.game||0),(a.reward.xp||0));
+      }
+      nu.push(a);
+    }
+  });
+  if(nu.length){
+    save();
+    nu.forEach(function(a,i){
+      setTimeout(function(){
+        const r=a.reward;
+        function fmtGame(g){if(!g)return'';if(g<1)return'+'+(g*60|0)+'s game';return'+'+g+'m game';}
+        const rStr=r&&(r.game||r.xp)?(fmtGame(r.game)+(r.xp?(r.game?' · ':'')+'+'+r.xp+' XP':'')):'';
+        toast('🏆 '+a.name+'! '+(rStr?'🎁 '+rStr:''),'tp');
+        sound('ach');
+        spawnPt();
+      },500+i*700);
+    });
+  }
+}
+function renderAch(){
+  const grid=document.getElementById('ach-grid');grid.innerHTML='';let cnt=0;
+  // Note stats bar — includes book notes
+  const nsb=document.getElementById('note-stats-bar');
+  if(nsb){
+    var allStats=typeof getAllNoteStats==='function'?getAllNoteStats():{totalNotes:S.notedSess||0,totalWords:S.totalNoteWords||0,longestNote:S.longestNote||0};
+    var booksWithNotes=0;
+    if(S.bookNotes){Object.keys(S.bookNotes).forEach(function(k){if(S.bookNotes[k]&&S.bookNotes[k].length>0)booksWithNotes++;});}
+    const stats=[
+      {icon:'📝',label:'Total notes',val:allStats.totalNotes,color:'#a78bfa'},
+      {icon:'📖',label:'Total words',val:allStats.totalWords,color:'#c084fc'},
+      {icon:'📚',label:'Books noted',val:booksWithNotes,color:'#60a5fa'},
+      {icon:'🔥',label:'Note streak',val:(S.bestNoteStreak||0)+'d',color:'#fb923c'},
+      {icon:'📝',label:'Reviews',val:S.reviewCount||0,color:'#34d399'},
+    ];
+    nsb.innerHTML=stats.map(function(st){
+      return '<div style="flex:1;min-width:70px;background:rgba(10,7,20,0.8);border:1px solid rgba(255,255,255,0.08);border-radius:2px;padding:7px 8px;text-align:center">'
+        +'<div style="font-size:.9rem">'+st.icon+'</div>'
+        +'<div style="font-size:.72rem;font-weight:700;color:'+st.color+';line-height:1.2">'+st.val+'</div>'
+        +'<div style="font-size:.52rem;color:var(--muted);margin-top:1px">'+st.label+'</div>'
+        +'</div>';
+    }).join('');
+  }
+  const CAT_HEADERS={
+    'first':      '🏁 Getting Started',
+    'm5':         '⏱ Session Length',
+    't30':        '📚 Total Minutes',
+    's2':         '🔥 Reading Streak',
+    'elite_r':    '⭐ Rank Milestones',
+    'promo1':     '⚔️ Challenges',
+    'book1':      '📖 Books',
+    'gm50':       '🎮 Gaming Budget',
+    'day30':      '🎯 Daily Reading',
+    'xp100':      '⬆️ XP Milestones',
+    'notes1':     '✏️ Note Habits — Frequency',
+    'nw50':       '🌱 Note Depth — Word Count',
+    'ns3':        '💬 Note Streak — Consistency',
+    'nl50':       '💡 Note Quality — Reflection',
+    'bn1':        '📚 Book Notes — Per Book',
+    'rev1':       '📝 Daily Review — Recall',
+    'rs3':        '🔥 Review Streak',
+    'rw100':      '📖 Review Depth',
+  };
+  ACHIEVEMENTS.forEach(function(a){
+    if(CAT_HEADERS[a.id]){
+      const hdr=document.createElement('div');
+      hdr.style.cssText='font-size:.6rem;font-weight:700;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;padding:10px 2px 4px;width:100%;grid-column:1/-1;border-top:1px solid rgba(255,255,255,0.06);margin-top:4px';
+      hdr.textContent=CAT_HEADERS[a.id];
+      grid.appendChild(hdr);
+    }
+    const u=S.achievements[a.id];if(u)cnt++;
+    const c=a.color||'#f0b429';
+    const r=a.reward;
+    const el=document.createElement('div');
+    el.className='ac'+(u?' ul':'');
+    if(u){
+      el.style.background='rgba('+hexToRgb(c)+',0.08)';
+      el.style.borderColor='rgba('+hexToRgb(c)+',0.35)';
+      el.style.boxShadow='0 0 16px rgba('+hexToRgb(c)+',0.12),inset 0 1px 0 rgba(255,255,255,0.08)';
+    }
+    // Reward badge
+    function fmtGameBadge(g){if(!g)return'';if(g<1)return'🎮 +'+(g*60|0)+'s';return'🎮 +'+g+'m';}
+    const rewardBadge=r
+      ?'<div style="display:flex;gap:4px;margin-top:5px;flex-wrap:wrap">'
+        +(r.game?'<span style="font-size:.52rem;padding:2px 7px;border-radius:99px;background:rgba(52,211,153,'+(u?'0.18':'0.07')+');border:1px solid rgba(52,211,153,'+(u?'0.4':'0.15')+');color:'+(u?'#34d399':'rgba(52,211,153,0.5)')+'">'+fmtGameBadge(r.game)+'</span>':'')
+        +(r.xp?'<span style="font-size:.52rem;padding:2px 7px;border-radius:99px;background:rgba(240,180,41,'+(u?'0.18':'0.07')+');border:1px solid rgba(240,180,41,'+(u?'0.4':'0.15')+');color:'+(u?'#f0b429':'rgba(240,180,41,0.5)')+'">⚡ +'+r.xp+' XP</span>':'')
+        +'</div>':'';
+    el.innerHTML='<span class="ac-i" style="'+(u?'filter:none':'filter:grayscale(1) opacity(.22)')+'">'+a.icon+'</span>'
+      +'<div class="ac-n" style="color:'+(u?c:'var(--muted);opacity:.6')+'">'+a.name+'</div>'
+      +'<div class="ac-d" style="opacity:'+(u?'0.75':'0.4')+'">'+a.desc+'</div>'
+      +rewardBadge
+      +(u?'<div class="ac-dt" style="color:'+c+';opacity:.6;margin-top:4px">✓ '+u.date+'</div>':'');
+    grid.appendChild(el);
+  });
+  document.getElementById('ach-cnt').textContent=cnt;
+  document.getElementById('ach-tot').textContent=ACHIEVEMENTS.length;
+}
+function hexToRgb(hex){
+  hex=hex.replace('#','');
+  if(hex.length===3)hex=hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+  const n=parseInt(hex,16);
+  return Math.round(n>>16)+','+Math.round((n>>8)&255)+','+Math.round(n&255);
+}
+function toast(msg,type){type=type||'tg';const wrap=document.getElementById('tw');const el=document.createElement('div');el.className='ti '+type;el.textContent=msg;wrap.appendChild(el);setTimeout(function(){el.remove();},3800);}
+function spawnPt(){const em=['⭐','✨','🎉','💫','🌟','⚡','🔥'];for(let i=0;i<14;i++){const p=document.createElement('div');p.className='pt';p.textContent=em[Math.floor(Math.random()*em.length)];p.style.left=Math.random()*100+'vw';p.style.top=(35+Math.random()*45)+'vh';p.style.animationDelay=Math.random()*0.6+'s';p.style.animationDuration=(1.2+Math.random()*0.8)+'s';document.body.appendChild(p);setTimeout(function(){p.remove();},2500);}}
+function sound(type){try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const presets={start:[{f:440,d:.1,t:0},{f:554,d:.1,t:.08}],reward:[{f:523,d:.12,t:0},{f:659,d:.12,t:.1},{f:784,d:.18,t:.22}],rankup:[{f:523,d:.1,t:0},{f:659,d:.1,t:.1},{f:784,d:.1,t:.2},{f:1047,d:.25,t:.32}],ach:[{f:880,d:.1,t:0},{f:1100,d:.12,t:.09}],end:[{f:330,d:.15,t:0},{f:262,d:.2,t:.12}]};(presets[type]||presets.start).forEach(function(n){const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=n.f;o.type='sine';g.gain.setValueAtTime(.12,ctx.currentTime+n.t);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+n.t+n.d);o.start(ctx.currentTime+n.t);o.stop(ctx.currentTime+n.t+n.d+.05);});}catch(e){}}
+function updateManualPreviews(){
+  const rm=parseInt(document.getElementById('manual-read-mins').value)||0;
+  const gm=parseInt(document.getElementById('manual-game-mins').value)||0;
+  if(rm>0){
+    const tier=currentTier();const bonus=Math.round(rm*tier.rewardMult*10)/10;
+    document.getElementById('manual-read-preview').textContent='→ +'+bonus+' min gaming | +'+Math.floor(rm*tier.rewardMult)+' XP';
+  } else document.getElementById('manual-read-preview').textContent='';
+  if(gm>0){
+    const remaining=Math.max(0,S.gameBudget-gm);
+    document.getElementById('manual-game-preview').textContent='→ Budget remaining: '+fmt(remaining)+' min';
+  } else document.getElementById('manual-game-preview').textContent='';
+}
+function manualAddRead(){
+  const mins=parseInt(document.getElementById('manual-read-mins').value)||0;
+  if(mins<=0){toast('Enter a valid number of minutes!','tg');return;}
+  if(mins>480){toast('Maximum 480 minutes (8 hours) per entry!','tg');return;}
+  const rawNote=document.getElementById('manual-read-note').value.trim();
+  const note=rawNote||'(manual)';
+  if(rawNote){
+    S.notedSess++;
+    const wordCount=rawNote.trim().split(/\s+/).filter(w=>w.length>0).length;
+    S.totalNoteWords=(S.totalNoteWords||0)+wordCount;
+    if(rawNote.length>(S.longestNote||0))S.longestNote=rawNote.length;
+  }
+  const t=today();
+  const prevDayMins=S.dailyMins[t]||0;
+  const{total:gameEarned,bonuses}=getGameBonus(mins);
+  const xpGained=getXP(mins);
+  S.totalBook+=mins;S.gameBudget+=gameEarned;S.totalXP+=xpGained;S.sessCount++;
+  if(mins>S.maxSess)S.maxSess=mins;
+  S.dailyMins[t]=prevDayMins+mins;
+  if(S.lastDate!==t){
+    const prev=S.lastDate;
+    if(prev){const diff=dateDiffDays(prev,t);S.streak=diff===1?S.streak+1:1;}
+    else{S.streak=1;}
+    S.lastDate=t;
+  }
+  if(S.streak>S.bestStreak)S.bestStreak=S.streak;
+  S.weekDays[t]=true;
+  const mab=getActiveBook();S.sessions.unshift({date:t,mins,note:'[Manual] '+note,book:(mab?mab.title:S.currentBook.title)||''});
+  addRewardHistory('manual','Manual +'+mins+'m reading',gameEarned,xpGained);
+  advanceDivisions();
+  updateDivProgress(t,S.dailyMins[t]);
+  STREAK_MILESTONES.forEach(function(m){const key='sm'+m.days;if(S.streak>=m.days&&!S.claimedSM.includes(key)){S.claimedSM.push(key);S.gameBudget+=m.gameBonus;setTimeout(function(){toast('🎉 Streak '+m.days+' days! +'+m.gameBonus+' min gaming!','tp');spawnPt();sound('rankup');},600);}});
+  updatePromoProgress(t,mins);save();checkAch();renderHome();
+  document.getElementById('manual-read-mins').value='';
+  document.getElementById('manual-read-note').value='';
+  document.getElementById('manual-read-preview').textContent='';
+  toast('📚 +'+mins+'m reading → +'+fmt(gameEarned)+'m gaming · +'+xpGained+' XP','tgr');sound('reward');spawnPt();
+}
+function manualDeductGame(){
+  const mins=parseInt(document.getElementById('manual-game-mins').value)||0;
+  if(mins<=0){toast('Enter a valid number of minutes!','tg');return;}
+  if(mins>S.gameBudget){toast('Not enough budget! Current: '+fmt(S.gameBudget)+'m','tr');return;}
+  S.gameBudget=Math.max(0,S.gameBudget-mins);
+  S.totalGame+=mins;save();renderHome();
+  document.getElementById('manual-game-mins').value='';
+  document.getElementById('manual-game-preview').textContent='';
+  toast('🎮 Deducted '+mins+'m. Left: remaining: '+fmt(S.gameBudget)+'m','tg');
+}
+let _frozenDaysSelected=3;
+function renderFrozenControls(){
+  const statusEl=document.getElementById('frozen-status');
+  const ctrlEl=document.getElementById('frozen-controls');
+  if(!statusEl||!ctrlEl)return;
+  if(S.frozenStreak&&S.frozenStreak.active){
+    const end=new Date(S.frozenStreak.endDate);
+    const dLeft=Math.max(0,Math.ceil((end-new Date())/86400000));
+    statusEl.innerHTML='<div class="frozen-active"><div style="font-size:2rem;margin-bottom:6px">❄️</div><div style="font-family:\'Cinzel\',serif;font-size:.8rem;color:#67e8f9;font-weight:700">STREAK FROZEN</div><div style="font-size:.75rem;color:var(--muted);margin-top:6px">Streak: <span style="color:#67e8f9;font-weight:700">'+S.streak+' days</span></div><div style="font-size:.75rem;color:var(--muted);margin-top:4px">Left: <span style="color:#67e8f9;font-weight:700">'+dLeft+' days</span> until expiry ('+fmtDate(S.frozenStreak.endDate)+')</div></div>';
+    ctrlEl.innerHTML='<button class="btn-unfreeze" onclick="unfreeze()">🔥 UNFREEZE EARLY</button>';
+  } else {
+    statusEl.innerHTML='<div style="font-size:.78rem;color:var(--muted);margin-bottom:10px">Choose days to protect your streak:</div><div class="frozen-days-row" id="frozen-days-row"></div>';
+    ctrlEl.innerHTML='<button class="btn-freeze" onclick="activateFreeze()">❄️ ACTIVATE FROZEN STREAK</button>';
+    const row=document.getElementById('frozen-days-row');
+    if(row){[3,5,7,10,14].forEach(d=>{const btn=document.createElement('button');btn.className='frozen-day-btn'+(d===_frozenDaysSelected?' selected':'');btn.textContent=d+' days';btn.onclick=function(){_frozenDaysSelected=d;renderFrozenControls();};row.appendChild(btn);});}
+  }
+}
+function activateFreeze(){
+  if(S.frozenStreak&&S.frozenStreak.active){toast('Streak is already frozen!','tg');return;}
+  const end=new Date();end.setDate(end.getDate()+_frozenDaysSelected);
+  S.frozenStreak={active:true,days:_frozenDaysSelected,startDate:today(),endDate:localDateStr(end)};
+  save();renderFrozenControls();renderHome();
+  toast('❄️ Streak '+S.streak+' days frozen for '+_frozenDaysSelected+' days!','tp');sound('rankup');
+}
+function unfreeze(){
+  S.frozenStreak={active:false};save();renderFrozenControls();renderHome();
+  toast('🔥 Streak unfrozen!','tg');
+}
+function checkFrozenExpiry(){
+  if(S.frozenStreak&&S.frozenStreak.active){
+    if(today()>S.frozenStreak.endDate){
+      S.frozenStreak.active=false;save();
+      toast('❄️ Frozen Streak has expired. Remember to read every day!','tp');
+    }
+  }
+}
+async function confirmReset(){
+  if(!confirm('⚠️ Reset all data?\nAll progress will be permanently deleted!'))return;
+  S=defState();
+  try{localStorage.removeItem('rq3');}catch(_){}
+  try{await window.storage.delete('rq3_state');syncBar('ok','☁ Reset & cloud cleared');}catch(e){syncBar('err','Reset local (cloud error)');}
+  checkDay();renderHome();setMode('book');checkAch();
+  toast('🗑 Reset! Start your new journey!','tp');sound('rankup');
+}
+// ═══ SHOW REMINDER POPUP ═══
+function showReminder(){
+  var pop=document.getElementById('reminder-popup');
+  var content=document.getElementById('popup-content');
+  var todayM=S.dailyMins[today()]||0;
+  var unlockedCount=Object.keys(S.achievements).length;
+  var totalAch=ACHIEVEMENTS.length;
+  var nextAchs=ACHIEVEMENTS.filter(function(a){return !S.achievements[a.id];}).slice(0,3);
+  var html='';
+  html+='<div class="popup-row"><span>📚 Today reading</span><span class="popup-val" style="color:#60a5fa">'+fmt(todayM)+' min</span></div>';
+  html+='<div class="popup-row"><span>🔥 Current streak</span><span class="popup-val" style="color:#fb923c">'+S.streak+' days</span></div>';
+  html+='<div class="popup-row"><span>🎮 Gaming budget</span><span class="popup-val" style="color:#34d399">'+fmt(S.gameBudget)+' min</span></div>';
+  html+='<div class="popup-row"><span>⚡ Total XP</span><span class="popup-val" style="color:#f0b429">'+S.totalXP+'</span></div>';
+  html+='<div class="popup-row"><span>🏆 Achievements</span><span class="popup-val" style="color:#a78bfa">'+unlockedCount+' / '+totalAch+'</span></div>';
+  if(nextAchs.length){
+    html+='<div style="margin-top:12px;font-size:.68rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">NEXT ACHIEVEMENTS</div>';
+    nextAchs.forEach(function(a){
+      html+='<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:.78rem"><span>'+a.icon+'</span><span style="flex:1">'+a.name+'</span><span style="font-size:.6rem;color:#34d399">🎮 +'+a.reward.game+'m</span></div>';
+    });
+  }
+  content.innerHTML=html;
+  pop.style.display='flex';
+}
+function closePopup(){document.getElementById('reminder-popup').style.display='none';}
+
+// ═══ MOTIVATIONAL CARDS ON HOME ═══
+function renderMotiCards(){
+  var el=document.getElementById('moti-cards');if(!el)return;
+  var todayM=S.dailyMins[today()]||0;
+  var cards=[];
+
+  // Smart milestone selection based on what user has already read today
+  // Only show the NEXT 2 achievable steps — not everything up to 120 min
+  var allSteps=[
+    {min:5,game:10},{min:10,game:15},{min:15,game:20},{min:20,game:25},
+    {min:30,game:55},{min:45,game:70},{min:60,game:110},{min:90,game:150},{min:120,game:200}
+  ];
+  var remaining=allSteps.filter(function(s){return todayM<s.min;});
+  // Only show next 2 milestones — keeps it focused and achievable
+  var nextSteps=remaining.slice(0,2);
+  nextSteps.forEach(function(rm){
+    var left=rm.min-Math.floor(todayM);
+    var bonusLabel=rm.min>=60?'SUPER BONUS':rm.min>=30?'BONUS':'';
+    cards.push({icon:rm.min>=60?'💪':rm.min>=30?'🔥':'📖',
+      title:'Read '+left+' more min'+(bonusLabel?' — '+bonusLabel:''),
+      desc:'Reach '+rm.min+' min today → '+rm.game+' min gaming.',
+      pct:Math.round((todayM/rm.min)*100),pctColor:rm.min>=60?'#f0b429':rm.min>=30?'#34d399':'#60a5fa',
+      type:left<=5?'urgent':'',gameMin:rm.game});
+  });
+
+  // Streak — only if relevant
+  if(S.streak>0&&!S.weekDays[today()]){
+    var streakBonus=S.streak>=7?45:S.streak>=3?15:5;
+    cards.push({icon:'🔥',title:'Keep your '+S.streak+'-day streak!',
+      desc:'Read today to save your streak.',
+      pct:0,pctColor:'#fb923c',type:'streak-m',gameMin:streakBonus});
+  }
+
+  // Sort by gameMin descending
+  cards.sort(function(a,b){return (b.gameMin||0)-(a.gameMin||0);});
+
+  // Limit to max 3 cards total
+  cards=cards.slice(0,3);
+
+  if(cards.length===0){
+    el.innerHTML='<div style="text-align:center;padding:12px;font-size:.78rem;color:var(--muted)">✅ All caught up! Keep reading to unlock more.</div>';
+    return;
+  }
+
+  el.innerHTML=cards.map(function(c){
+    return '<div class="moti-item '+c.type+'" onclick="gp(\'timer\')">'
+      +'<div class="moti-icon-big">'+c.icon+'</div>'
+      +'<div class="moti-body">'
+      +'<div class="moti-title">'+c.title+'</div>'
+      +'<div class="moti-desc">'+c.desc+'</div>'
+      +'<div class="moti-progress"><div class="moti-progress-bar" style="width:'+c.pct+'%;background:'+c.pctColor+'"></div></div>'
+      +'</div>'
+      +'<div class="moti-game-val">+'+c.gameMin+'<span class="moti-game-unit">min 🎮</span></div>'
+      +'</div>';
+  }).join('');
+}
+
+// ═══ SINGLE MISSION BUBBLE — PRIORITY SYSTEM ═══
+var _missionOpen=false;
+var _lastCompletedMission='';
+
+function toggleMission(){
+  _missionOpen=!_missionOpen;
+  document.getElementById('mission-popup').classList.toggle('open',_missionOpen);
+  if(_missionOpen)updateMission();
+}
+
+function getMissionPriority(){
+  // Returns the single most important mission right now
+  var todayM=S.dailyMins[today()]||0;
+  var missions=[];
+
+  // Priority 1: Streak at risk (highest urgency)
+  if(S.streak>0&&!S.weekDays[today()]){
+    missions.push({id:'streak-risk',priority:100,icon:'🔥',title:'Keep your '+S.streak+'-day streak!',desc:'Read anything today to protect your streak.',
+      rewards:[{label:'🔥 Save streak',type:'red'}],pct:0,pctColor:'#fb923c',btnText:'▶ READ TO SAVE STREAK'});
+  }
+
+  // Priority 2: Progressive reading milestones — show the NEXT one only
+  var readSteps=[
+    {min:5,  game:10, label:'Read 5 min → earn 10m gaming'},
+    {min:10, game:15, label:'Read 10 min → earn 15m gaming'},
+    {min:15, game:20, label:'Read 15 min → earn 20m gaming'},
+    {min:20, game:25, label:'Read 20 min → earn 25m gaming'},
+    {min:30, game:35, label:'Read 30 min → BONUS +20m extra!'},
+    {min:45, game:50, label:'Read 45 min → big reward!'},
+    {min:60, game:70, label:'Read 1 hour → SUPER BONUS +40m!'},
+    {min:90, game:100,label:'Read 90 min → legendary reward!'},
+    {min:120,game:140,label:'Read 2 hours → ultimate reward!'},
+  ];
+  var nextStep=readSteps.find(function(s){return todayM<s.min;});
+  if(nextStep){
+    var left=nextStep.min-Math.floor(todayM);
+    missions.push({id:'read-'+nextStep.min,priority:50+Math.round((todayM/nextStep.min)*30),icon:'📖',
+      title:'Read '+left+' more min',desc:nextStep.label,
+      rewards:[{label:'🎮 +'+nextStep.game+'m game',type:'green'},{label:'⚡ +XP',type:'gold'}],
+      pct:Math.round((todayM/nextStep.min)*100),pctColor:'#60a5fa',btnText:'▶ START READING'});
+  }
+
+  // Priority 3: Streak milestone approaching
+  if(S.streak>0&&S.weekDays[today()]){
+    var streakGoals=[3,5,7,10,14,21,30,60,100];
+    var nextSG=streakGoals.find(function(g){return S.streak<g;});
+    if(nextSG&&(nextSG-S.streak)<=3){
+      var sa=ACHIEVEMENTS.find(function(a){return a.id==='s'+nextSG;});
+      missions.push({id:'streak-goal-'+nextSG,priority:40,icon:'🔥',
+        title:'Streak '+S.streak+' → '+nextSG+' days!',
+        desc:(nextSG-S.streak)+' more day'+(nextSG-S.streak>1?'s':'')+' to unlock "'+(sa?sa.name:'Achievement')+'"',
+        rewards:[{label:'🏆 +'+((sa&&sa.reward)?sa.reward.game:20)+'m game',type:'gold'}],
+        pct:Math.round((S.streak/nextSG)*100),pctColor:'#fb923c',btnText:'▶ KEEP READING'});
+    }
+  }
+
+  // Priority 4: Notes reminder (low frequency)
+  if((S.notedSess||0)<3&&(S.notedSess||0)>=0&&todayM>=10){
+    missions.push({id:'notes-reminder',priority:20,icon:'📝',
+      title:'Write a note!',desc:'Taking notes helps you remember. Write '+(3-(S.notedSess||0))+' more notes to unlock "3 Notes".',
+      rewards:[{label:'✏️ +10 XP',type:'gold'}],
+      pct:Math.round(((S.notedSess||0)/3)*100),pctColor:'#a78bfa',btnText:'▶ ADD NOTE'});
+  }
+
+  // Sort by priority (highest first) and skip the last completed mission
+  missions.sort(function(a,b){return b.priority-a.priority;});
+  var filtered=missions.filter(function(m){return m.id!==_lastCompletedMission;});
+  return filtered.length>0?filtered[0]:(missions.length>0?missions[0]:null);
+}
+
+function updateMission(){
+  var m=getMissionPriority();
+  var btn=document.getElementById('mission-btn');
+  var dot=document.getElementById('mission-dot');
+  if(!m){
+    btn.className='mission-btn no-mission';
+    dot.style.display='none';
+    if(_missionOpen){
+      document.getElementById('mp-icon').textContent='✅';
+      document.getElementById('mp-title').textContent='All caught up!';
+      document.getElementById('mp-desc').textContent='No active missions. Keep reading to unlock more!';
+      document.getElementById('mp-reward').innerHTML='';
+      document.getElementById('mp-progress').style.width='100%';
+      document.getElementById('mp-progress').style.background='#34d399';
+      document.querySelector('.mp-go').textContent='▶ READ MORE';
+    }
+    return;
+  }
+  btn.className='mission-btn has-mission';
+  dot.style.display='';
+  btn.querySelector('span:first-child')||btn.childNodes[0];
+  // Only update popup content if it's open
+  if(_missionOpen||true){
+    document.getElementById('mp-icon').textContent=m.icon;
+    document.getElementById('mp-title').textContent=m.title;
+    document.getElementById('mp-desc').textContent=m.desc;
+    document.getElementById('mp-reward').innerHTML=m.rewards.map(function(r){
+      return '<span class="mp-reward-tag '+(r.type||'')+'">'+r.label+'</span>';
+    }).join('');
+    document.getElementById('mp-progress').style.width=m.pct+'%';
+    document.getElementById('mp-progress').style.background=m.pctColor;
+    document.querySelector('.mp-go').textContent=m.btnText||'▶ START READING';
+  }
+}
+
+// Check if a mission was just completed (called after each reading session)
+var _prevMissionId='';
+function checkMissionCompletion(){
+  var m=getMissionPriority();
+  var currentId=m?m.id:'none';
+  if(_prevMissionId&&_prevMissionId!==currentId&&_prevMissionId!=='none'){
+    // Previous mission was completed! Mark it
+    _lastCompletedMission=_prevMissionId;
+    // Auto-show the next mission after a short delay
+    setTimeout(function(){
+      _lastCompletedMission=''; // Reset so it can show again later
+      updateMission();
+    },5000);
+  }
+  _prevMissionId=currentId;
+  updateMission();
+}
+
+function showFloatReminder(){
+  if(running)return;
+  updateMission();
+}
+function dismissFloatReminder(){
+  _missionOpen=false;
+  document.getElementById('mission-popup').classList.remove('open');
+}
+
+// Close popup when clicking outside
+document.addEventListener('click',function(e){
+  if(!_missionOpen)return;
+  var wrap=document.querySelector('.mission-bell-anchor');
+  if(wrap&&!wrap.contains(e.target)){
+    _missionOpen=false;
+    document.getElementById('mission-popup').classList.remove('open');
+  }
+});
+
+// Patch renderHome to also render moti cards + mission
+var _origRenderHome=renderHome;
+renderHome=function(){
+  _origRenderHome();
+  renderMotiCards();
+  checkMissionCompletion();
+};
+
+// ═══ INJECT NOTES INTO REVIEW POPUP ═══
+function _injectReviewNotes(){
+  var sec=document.getElementById('review-notes-section');
+  var list=document.getElementById('review-notes-list');
+  if(!sec||!list)return;
+  initBookNotes();
+  // Collect all notes from all books, newest first, max 10
+  var allNotes=[];
+  if(S.books){
+    S.books.forEach(function(bk){
+      var notes=S.bookNotes&&S.bookNotes[bk.id]?S.bookNotes[bk.id]:[];
+      notes.forEach(function(n){allNotes.push({text:n.text,date:n.date,book:bk.title,words:n.words||0});});
+    });
+  }
+  if(!allNotes.length){sec.style.display='none';return;}
+  // Sort newest first
+  allNotes.sort(function(a,b){return (b.date||'').localeCompare(a.date||'');});
+  allNotes=allNotes.slice(0,8);
+  sec.style.display='';
+  list.innerHTML=allNotes.map(function(n){
+    return '<div style="padding:7px 0;border-bottom:1px solid rgba(167,139,250,0.08);last-child:border:none">'
+      +'<div style="font-size:.7rem;color:rgba(220,185,125,0.9);line-height:1.55;white-space:pre-wrap;word-break:break-word">'+escHtml(n.text)+'</div>'
+      +'<div style="font-size:.55rem;color:rgba(167,139,250,0.55);margin-top:3px;font-family:\'Share Tech Mono\',monospace">'+fmtDate(n.date)+' · '+n.book+(n.words?' · '+n.words+' words':'')+'</div>'
+      +'</div>';
+  }).join('');
+}
+
+// ═══ DAILY REVIEW POPUP ═══
+function checkDailyReview(){
+  // Show review popup once per day, only if user has read before (has sessions)
+  if(!S.sessCount||S.sessCount<1)return;
+  var t=today();
+  if(S.lastReviewPopupDate===t)return; // Already shown today
+  // Only show if yesterday had reading
+  var yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
+  var yKey=localDateStr(yesterday);
+  if(!S.dailyMins[yKey]&&!S.totalBook)return; // No reading history
+  _openReviewPopup();
+}
+function _openReviewPopup(){
+  var t=today();
+  var yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
+  var yKey=localDateStr(yesterday);
+  // Show popup
+  var yesterdayMins=S.dailyMins[yKey]||0;
+  var subtitle=yesterdayMins>0
+    ?'You read '+Math.round(yesterdayMins)+' min yesterday. What do you remember? Write a quick review to earn bonus!'
+    :'Take a moment to recall what you\'ve been reading lately. Writing it down helps you remember!';
+  document.getElementById('review-subtitle').textContent=subtitle;
+  // Show review streak info
+  var rsInfo='';
+  if((S.reviewStreak||0)>0)rsInfo='🔥 Review streak: '+(S.reviewStreak)+' days — keep it going!';
+  document.getElementById('review-streak-info').textContent=rsInfo;
+  document.getElementById('review-overlay').classList.add('show');
+  S.lastReviewPopupDate=t;
+  // Populate notes recall section
+  _injectReviewNotes();
+  save();
+}
+function submitReview(){
+  var text=document.getElementById('review-text').value.trim();
+  if(!text){toast('Write something to earn the reward!','tg');return;}
+  var wordCount=text.split(/\s+/).filter(function(w){return w.length>0;}).length;
+  // Update review stats
+  S.reviewCount=(S.reviewCount||0)+1;
+  S.totalReviewWords=(S.totalReviewWords||0)+wordCount;
+  // Review streak
+  var t=today();
+  if(S.lastReviewDate){
+    var diff=Math.round((new Date(t)-new Date(S.lastReviewDate))/86400000);
+    if(diff===1)S.reviewStreak=(S.reviewStreak||0)+1;
+    else if(diff>1)S.reviewStreak=1;
+  } else {S.reviewStreak=1;}
+  S.lastReviewDate=t;
+  if((S.reviewStreak||0)>(S.bestReviewStreak||0))S.bestReviewStreak=S.reviewStreak;
+  // Save review
+  if(!S.reviews)S.reviews=[];
+  S.reviews.unshift({date:t,text:text,words:wordCount});
+  if(S.reviews.length>50)S.reviews=S.reviews.slice(0,50); // Keep last 50
+  // Grant rewards — small, to encourage habit not farming
+  var gameReward=2;
+  var xpReward=15;
+  // Bonus for longer reviews
+  if(wordCount>=50){gameReward+=1;xpReward+=10;}
+  if(wordCount>=100){gameReward+=2;xpReward+=15;}
+  S.gameBudget+=gameReward;
+  S.totalXP+=xpReward;
+  addRewardHistory('review','Daily Review ('+wordCount+' words)',gameReward,xpReward);
+  save();checkAch();renderHome();
+  document.getElementById('review-overlay').classList.remove('show');
+  document.getElementById('review-text').value='';
+  toast('📝 Review submitted! +'+gameReward+'m game · +'+xpReward+' XP','tgr');
+  sound('reward');spawnPt();
+}
+function skipReview(){
+  document.getElementById('review-overlay').classList.remove('show');
+  document.getElementById('review-text').value='';
+  // Reset review streak on skip
+  if(S.reviewStreak>0){
+    S.reviewStreak=0;
+    save();
+  }
+  toast('Skipped — you can review anytime from notes!','tg');
+}
+
+// ═══ EXPORT / IMPORT ═══
+function exportData(){
+  try{
+    var filename='readquest-backup-'+today()+'.json';
+    var json=JSON.stringify(S,null,2);
+    var blob=new Blob([json],{type:'application/json'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;a.download=filename;
+    document.body.appendChild(a);a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('✅ Exported: '+filename,'tgr');
+  } catch(e){
+    toast('❌ Export thất bại: '+e.message,'tg');
+  }
+}
+function importData(event){
+  var file=event.target.files[0];
+  if(!file){return;}
+  var statusEl=document.getElementById('import-status');
+  statusEl.style.color='var(--muted)';
+  statusEl.textContent='⏳ Đang đọc file...';
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var parsed=JSON.parse(e.target.result);
+      if(typeof parsed.totalXP==='undefined'&&typeof parsed.totalBook==='undefined'){
+        throw new Error('File không đúng định dạng ReadQuest');
+      }
+      if(!confirm('Import sẽ GHI ĐÈ toàn bộ dữ liệu hiện tại. Tiếp tục?')){
+        statusEl.textContent='';
+        event.target.value='';
+        return;
+      }
+      S=parsed;
+      save();
+      checkAch();renderHome();
+      statusEl.style.color='#34d399';
+      statusEl.textContent='✅ Import thành công! Dữ liệu đã được khôi phục.';
+      toast('✅ Import thành công!','tgr');
+      setTimeout(function(){statusEl.textContent='';},5000);
+    } catch(err){
+      statusEl.style.color='#f87171';
+      statusEl.textContent='❌ Lỗi: '+err.message;
+      toast('❌ Import thất bại','tg');
+    }
+    event.target.value='';
+  };
+  reader.readAsText(file);
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  var ri = document.getElementById('manual-read-mins');
+  var gi = document.getElementById('manual-game-mins');
+  if(ri) ri.addEventListener('input', updateManualPreviews);
+  if(gi) gi.addEventListener('input', updateManualPreviews);
+  cloudLoad();
+  // Show daily review popup after data loads (with delay for smooth UX)
+  setTimeout(function(){checkDailyReview();},1500);
+  // Update mission bubble after 3s, then every 2 min
+  setTimeout(showFloatReminder,3000);
+  setInterval(showFloatReminder,120000);
+});
+
+// ═══ DATE MIGRATION TOOL ═══
+function initMigrate(){
+  var fromEl=document.getElementById('migrate-from');
+  var toEl=document.getElementById('migrate-to');
+  if(!fromEl||!toEl)return;
+  var dates=Object.keys(S.dailyMins).sort().reverse();
+  var suggestFrom=dates.length?dates[0]:'';
+  var suggestTo='';
+  if(suggestFrom){var d=new Date(suggestFrom+'T12:00:00');d.setDate(d.getDate()+1);suggestTo=localDateStr(d);}
+  if(!fromEl.value)fromEl.value=suggestFrom;
+  if(!toEl.value)toEl.value=suggestTo||today();
+  renderMigrateSessionList();
+}
+function renderMigrateSessionList(){
+  var from=document.getElementById('migrate-from').value;
+  var el=document.getElementById('migrate-session-list');
+  if(!el)return;
+  if(!from){el.innerHTML='';return;}
+  var sessions=(S.sessions||[]).map(function(s,i){return{s,i};}).filter(function(o){return o.s.date===from;});
+  if(!sessions.length){el.innerHTML='<div style="font-size:.75rem;color:var(--muted);padding:6px">No sessions found on '+from+'</div>';return;}
+  el.innerHTML=sessions.map(function(o){
+    var s=o.s;var i=o.i;
+    return '<label style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:2px;background:rgba(7,5,16,0.85);border:1px solid rgba(255,255,255,0.06);cursor:pointer">'
+      +'<input type="checkbox" data-idx="'+i+'" checked style="accent-color:#67e8f9;width:15px;height:15px;flex-shrink:0"/>'
+      +'<span style="font-family:\'Cinzel\',serif;font-size:.82rem;color:#60a5fa;font-weight:700;flex-shrink:0">'+s.mins+'m</span>'
+      +'<span style="font-size:.72rem;color:var(--muted);flex:1">'+(s.book?'['+s.book+'] ':'')+' '+(s.note&&s.note!='--'?s.note:'')+'</span>'
+      +'</label>';
+  }).join('');
+}
+function migrateDate(){
+  var from=document.getElementById('migrate-from').value;
+  var to=document.getElementById('migrate-to').value;
+  if(!from||!to){toast('Select both dates!','tg');return;}
+  if(from===to){toast('Dates are the same.','tg');return;}
+  var checked=Array.from(document.querySelectorAll('#migrate-session-list input[type=checkbox]:checked'));
+  if(!checked.length){toast('Select at least one session!','tg');return;}
+  var idxs=checked.map(function(cb){return parseInt(cb.dataset.idx);});
+  var totalMins=idxs.reduce(function(sum,i){return sum+(parseFloat(S.sessions[i].mins)||0);},0);
+  if(!confirm('Move '+idxs.length+' session(s) ('+Math.round(totalMins)+'m) from '+from+' → '+to+'?'))return;
+
+  // Move selected sessions
+  idxs.forEach(function(i){S.sessions[i].date=to;});
+
+  // Update dailyMins
+  S.dailyMins[from]=(S.dailyMins[from]||0)-totalMins;
+  if(S.dailyMins[from]<=0)delete S.dailyMins[from];
+  S.dailyMins[to]=(S.dailyMins[to]||0)+totalMins;
+
+  // Update weekDays
+  if(!S.dailyMins[from])delete S.weekDays[from];
+  if(S.dailyMins[to]>0)S.weekDays[to]=true;
+
+  // Fix lastDate
+  if(S.lastDate===from&&!S.dailyMins[from])S.lastDate=to;
+
+  // Recalculate streak
+  var streak=0;
+  var cur=new Date(today()+'T12:00:00');
+  var checkDate=localDateStr(cur);
+  if(!S.dailyMins[checkDate]){cur.setDate(cur.getDate()-1);checkDate=localDateStr(cur);}
+  if(S.dailyMins[checkDate]){
+    streak=1;
+    var prev=new Date(checkDate+'T12:00:00');
+    for(var i=1;i<365;i++){prev.setDate(prev.getDate()-1);var k=localDateStr(prev);if(S.dailyMins[k]){streak++;}else{break;}}
+  }
+  S.streak=streak;
+  if(streak>S.bestStreak)S.bestStreak=streak;
+
+  save();renderHome();
+  document.getElementById('migrate-from').value=from;
+  renderMigrateSessionList();
+  toast('✅ Moved '+idxs.length+' session(s) → '+to+' · Streak: '+streak+' days','tgr');
+}</script>
+
+<script>
+// ── Inject corner decorations into all cards ──
+function injectCorners(){
+  document.querySelectorAll('.card').forEach(function(card){
+    if(card.querySelector('.cc')) return;
+    ['tl','tr','bl','br'].forEach(function(pos){
+      var s=document.createElement('span');
+      s.className='cc cc-'+pos;
+      card.appendChild(s);
+    });
+  });
+}
+
+// ── Ambient gold dust particles ──
+function spawnAmbientParticle(){
+  var symbols=['✦','✧','·','∘','◦','⋆','˚'];
+  var p=document.createElement('div');
+  p.style.cssText=[
+    'position:fixed',
+    'left:'+Math.random()*100+'vw',
+    'top:'+(80+Math.random()*20)+'vh',
+    'pointer-events:none',
+    'z-index:0',
+    'font-size:'+(0.4+Math.random()*0.5)+'rem',
+    'color:rgba(200,146,26,'+(0.1+Math.random()*0.25)+')',
+    'animation:ambFloat '+(8+Math.random()*12)+'s linear forwards',
+    'opacity:0'
+  ].join(';');
+  p.textContent=symbols[Math.floor(Math.random()*symbols.length)];
+  document.body.appendChild(p);
+  setTimeout(function(){p.remove()},20000);
+}
+
+// Add ambient float animation
+var ambStyle=document.createElement('style');
+ambStyle.textContent='@keyframes ambFloat{0%{opacity:0;transform:translateY(0) rotate(0deg)}10%{opacity:1}90%{opacity:.4}100%{opacity:0;transform:translateY(-80vh) rotate(180deg)}}';
+document.head.appendChild(ambStyle);
+
+// Run on load and tab changes
+document.addEventListener('DOMContentLoaded',function(){
+  injectCorners();
+  setInterval(spawnAmbientParticle, 3000);
+  // Re-inject on tab switch
+  document.querySelectorAll('.nb').forEach(function(btn){
+    btn.addEventListener('click',function(){setTimeout(injectCorners,50)});
+  });
+});
+</script>
+</body>
+</html>
